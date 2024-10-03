@@ -1,0 +1,65 @@
+{
+    "hideFilterBar": false,
+    "componentid": "fc0956e2-dd96-4ec4-9b21-a01308a1c6fe",
+    "latitude": "33.854365",
+    "longitude": "-80.706542",
+    "zoomLevel": "8",
+    "locationsArray": [
+        {
+            "buildingAbbreviation": "",
+            "buildingCity": "Mount Pleasant",
+            "buildingLatitude": "32.792420",
+            "buildingLongitude": "-79.853946",
+            "buildingName1": "Ben Sawyer Primary Care",
+            "buildingName2": "",
+            "buildingState": "SC",
+            "buildingStreet1": "1440 Ben Sawyer Boulevard",
+            "buildingStreet2": "",
+            "buildingZip": "29464",
+            "directionsLinkUrl": "https://www.google.com/maps/dir//1440%20Ben%20Sawyer%20Boulevard+Mount%20Pleasant+SC+29464",
+            "viewDetailsLinkUrl": "https://locations.muschealth.org/sc/mount-pleasant/1440-ben-sawyer-blvd",
+            "hideBuildingName": false,
+            "locationId": "f658bd3b-7bf9-44b7-b1ec-0cdb3087729e",
+            "locationName": "Allergy Ben Sawyer",
+            "locationMainPhone": "",
+            "categoriesArray": [
+                {
+                    "categoryID": "9d3633c3-c4ba-45fb-9aca-2255d5162c59",
+                    "categoryName": "Allergy and Immunology"
+                }
+            ]
+        },
+        {
+            "buildingAbbreviation": "",
+            "buildingCity": "Charleston",
+            "buildingLatitude": "32.783636",
+            "buildingLongitude": "-79.951803",
+            "buildingName1": "Ashley River Tower",
+            "buildingName2": "",
+            "buildingState": "SC",
+            "buildingStreet1": "25 Courtenay Drive",
+            "buildingStreet2": "",
+            "buildingZip": "29425",
+            "directionsLinkUrl": "https://www.google.com/maps/dir//25%20Courtenay%20Drive+Charleston+SC+29425",
+            "viewDetailsLinkUrl": "https://locations.muschealth.org/sc/charleston/25-courtenay-dr-fac80",
+            "hideBuildingName": true,
+            "locationId": "adef4f71-54fe-4205-ac06-3756fc1e257c",
+            "locationName": "Ashley River Tower",
+            "locationMainPhone": "",
+            "categoriesArray": [
+                {
+                    "categoryID": "1c9b82e2-5425-4c19-960e-5fba116d0585",
+                    "categoryName": "Bariatric Surgery"
+                },
+                {
+                    "categoryID": "04047d0f-cf85-4ca5-85ec-511053cd7a86",
+                    "categoryName": "Cardiology"
+                },
+                {
+                    "categoryID": "1d6b1c77-6399-47b3-9e19-48c2cd6f6aca",
+                    "categoryName": "Chest Pain Center"
+                }
+            ]
+        }
+    ]
+}

@@ -29,3 +29,7 @@
     background: #fff;
     border: 1px solid #ccc;
 }
+
+.list-and-map {
+    display: flex;
+}
