@@ -7,11 +7,6 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="counter-box">
-        <h1>Counter: <span id="counter-value">0</span></h1>
-        <button id="increment-btn">Increment</button>
-        <button id="decrement-btn">Decrement</button>
-    </div>
     <div id="map-explorer">
         <div id="search-bar">
             <input type="text" id="search-input" placeholder="Enter a location...">
@@ -25,11 +20,13 @@
         <div id="filter-bar">
             <label><input type="checkbox" id="wheelchair-accessible"> Wheelchair Accessible</label>
         </div>
-        <div id="map" style="width: 600px; height: 400px;"></div>
-        <div id="location-list" style="height: 400px; overflow-y: scroll;"></div>
+        <div class="content-and-map">
+            <div id="map" style="width: 600px; height: 400px;"></div>
+            <div id="location-list" style="height: 400px; overflow-y: scroll;"></div>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@reduxjs/toolkit@latest/dist/redux-toolkit.umd.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
-    <script src="app.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

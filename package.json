@@ -4,13 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite --open",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.6",
     "@reduxjs/toolkit": "^2.2.7",
     "sass": "^1.79.4"
+  },
+  "devDependencies": {
+    "vite": "^5.4.8"
   }
 }
