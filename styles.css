@@ -6,7 +6,7 @@
     text-align: center;
     border: 2px solid black;
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #map-explorer {
@@ -15,7 +15,8 @@
     gap: 20px;
 }
 
-#search-bar, #filter-bar {
+#search-bar,
+#filter-bar {
     grid-column: 1 / -1;
     padding: 10px;
     background: #f0f0f0;
@@ -23,11 +24,6 @@
 
 #map {
     grid-row: 2 / 4;
-}
-
-#location-list {
-    background: #fff;
-    border: 1px solid #ccc;
 }
 
 .list-and-map {

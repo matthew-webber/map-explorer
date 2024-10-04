@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Counter App</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="src/components/map-explorer/LocationList/LocationList.scss">
+    <link rel="stylesheet" href="src/components/map-explorer/SearchBar/SearchBar.scss">
+    <link rel="stylesheet" href="src/components/map-explorer/Map/Map.scss">
+    <link rel="stylesheet" href="src/components/map-explorer/MapExplorer.scss">
+    <link rel="stylesheet" href="src/components/map-explorer/Filter/Filter.scss">
 </head>
+
 <body>
     <div id="map-explorer">
         <div id="search-bar">
@@ -21,7 +28,7 @@
             <label><input type="checkbox" id="wheelchair-accessible"> Wheelchair Accessible</label>
         </div>
         <div class="list-and-map">
-            <div id="location-list" style="height: 400px; width: 150px; background-color: lightgrey; overflow-y: scroll;"></div>
+            <div id="location-list"></div>
             <div id="map" style="width: 600px; height: 400px;"></div>
         </div>
     </div>
@@ -29,4 +36,5 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM"></script>
     <script type="module" src="app.js"></script>
 </body>
+
 </html>
