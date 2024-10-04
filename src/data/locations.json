@@ -3,7 +3,7 @@
     "componentid": "fc0956e2-dd96-4ec4-9b21-a01308a1c6fe",
     "latitude": "33.854365",
     "longitude": "-80.706542",
-    "zoomLevel": "8",
+    "zoomLevel": "7",
     "locationsArray": [
         {
             "buildingAbbreviation": "",
@@ -28,6 +28,44 @@
                     "categoryName": "Allergy and Immunology"
                 }
             ]
+        },
+        {
+            "buildingAbbreviation": "",
+            "buildingCity": "Florence",
+            "buildingLatitude": "34.190780",
+            "buildingLongitude": "-79.805247",
+            "buildingName1": "1925 Hoffmeyer Road",
+            "buildingName2": "",
+            "buildingState": "SC",
+            "buildingStreet1": "1925 Hoffmeyer Road",
+            "buildingStreet2": "",
+            "buildingZip": "29501",
+            "directionsLinkUrl": "https://www.google.com/maps/dir//1925%20Hoffmeyer%20Road+Florence+SC+29501",
+            "viewDetailsLinkUrl": "https://locations.muschealth.org/sc/florence/1925-hoffmeyer-road-fac304",
+            "hideBuildingName": true,
+            "locationId": "53cf4126-d9fd-4833-9e30-c43391c1e88c",
+            "locationName": "Physical Medicine & Rehab Hoffmeyer",
+            "locationMainPhone": "",
+            "categoriesArray": []
+        },
+        {
+            "buildingAbbreviation": "",
+            "buildingCity": "Simpsonville",
+            "buildingLatitude": "34.7197554",
+            "buildingLongitude": "-82.2492715",
+            "buildingName1": "114 B Hospital Drive",
+            "buildingName2": "",
+            "buildingState": "South Carolina",
+            "buildingStreet1": "114 B Hospital Drive",
+            "buildingStreet2": "",
+            "buildingZip": "29681",
+            "directionsLinkUrl": "https://www.google.com/maps/dir//114%20B%20Hospital%20Drive+Simpsonville+South%20Carolina+29681",
+            "viewDetailsLinkUrl": "https://locations.muschealth.org/sc/simpsonville/114-b-hospital-dr",
+            "hideBuildingName": true,
+            "locationId": "02dd2531-bf22-4e73-b779-e396e20d583f",
+            "locationName": "Simpsonville - Grace Internal",
+            "locationMainPhone": "864-757-5177",
+            "categoriesArray": []
         },
         {
             "buildingAbbreviation": "",
