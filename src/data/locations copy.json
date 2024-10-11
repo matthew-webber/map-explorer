@@ -1,0 +1,81 @@
+{
+    "hideFilterBar": false,
+    "componentid": "fc0956e2-dd96-4ec4-9b21-a01308a1c6fe",
+    "latitude": "33.854365",
+    "longitude": "-80.706542",
+    "zoomLevel": "7",
+    "locationsArray": [
+        {
+            "buildingAbbreviation": "",
+            "buildingCity": "Charleston",
+            "buildingLatitude": "32.787509",
+            "buildingLongitude": "-79.9516737",
+            "buildingName1": "135 Cannon Street",
+            "buildingName2": "",
+            "buildingState": "SC",
+            "buildingStreet1": "135 Cannon Street",
+            "buildingStreet2": "",
+            "buildingZip": "29425",
+            "directionsLinkUrl": "https://www.google.com/maps/dir//135%20Cannon%20Street+Charleston+SC+29425",
+            "viewDetailsLinkUrl": "https://locations.muschealth.org/sc/charleston/135-cannon-street-2nd-floor-fac86",
+            "hideBuildingName": true,
+            "locationId": "13d83a67-4bcb-471e-a0fe-262d7a316c62",
+            "locationName": "Blood Draw Cannon Street",
+            "locationMainPhone": "",
+            "categoriesArray": [
+                {
+                    "categoryID": "c327153e-6d55-4140-83d1-558af732a985",
+                    "categoryName": "Lab - Blood Draw"
+                }
+            ]
+        },
+        {
+            "buildingAbbreviation": "",
+            "buildingCity": "Mount Pleasant",
+            "buildingLatitude": "32.817630",
+            "buildingLongitude": "-79.840537",
+            "buildingName1": "East Cooper Medical Pavilion",
+            "buildingName2": "",
+            "buildingState": "SC",
+            "buildingStreet1": "1600 Midtown Avenue",
+            "buildingStreet2": "",
+            "buildingZip": "29464",
+            "directionsLinkUrl": "https://www.google.com/maps/dir//1600%20Midtown%20Avenue+Mount%20Pleasant+SC+29464",
+            "viewDetailsLinkUrl": "https://locations.muschealth.org/sc/mount-pleasant/1600-midtown-ave-1st-floor-fac4",
+            "hideBuildingName": false,
+            "locationId": "50321e4a-e7eb-4259-ba38-7153e66dec28",
+            "locationName": "Blood Draw East Cooper",
+            "locationMainPhone": "",
+            "categoriesArray": [
+                {
+                    "categoryID": "c327153e-6d55-4140-83d1-558af732a985",
+                    "categoryName": "Lab - Blood Draw"
+                }
+            ]
+        },
+        {
+            "buildingAbbreviation": "",
+            "buildingCity": "Orangeburg",
+            "buildingLatitude": "33.4887740",
+            "buildingLongitude": "-80.8654020",
+            "buildingName1": "1175 Cook Road",
+            "buildingName2": "",
+            "buildingState": "SC",
+            "buildingStreet1": "1175 Cook Road",
+            "buildingStreet2": "",
+            "buildingZip": "29118",
+            "directionsLinkUrl": "https://www.google.com/maps/dir//1175%20Cook%20Road+Orangeburg+SC+29118",
+            "viewDetailsLinkUrl": "https://locations.muschealth.org/sc/orangeburg/1175-cook-rd-fac855",
+            "hideBuildingName": true,
+            "locationId": "9d3bf95a-f969-4f7f-b609-a3b3dbaeb546",
+            "locationName": "Cardiology Orangeburg",
+            "locationMainPhone": "",
+            "categoriesArray": [
+                {
+                    "categoryID": "04047d0f-cf85-4ca5-85ec-511053cd7a86",
+                    "categoryName": "Cardiology"
+                }
+            ]
+        }
+    ]
+}

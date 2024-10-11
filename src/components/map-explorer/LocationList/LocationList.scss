@@ -1,7 +1,6 @@
 #location-list {
     box-sizing: border-box;
     border: 1px solid #ccc;
-    height: 400px;
     width: 150px;
     overflow-y: scroll;
     display: flex;
@@ -10,7 +9,6 @@
     justify-content: flex-start;
     align-items: center;
     padding: 10px;
-    margin: 10px;
     border-radius: 5px;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
 

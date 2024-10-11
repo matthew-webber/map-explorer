@@ -14,8 +14,14 @@ class MapExplorer {
         this.map = new Map();
         this.searchBar = new SearchBar(this.map);
         this.filter = new Filter(this.map);
-        this.locationList = new LocationList();
-        console.log(`123 finished mapexplorer init`);
+        // Pass the handleLocationClick method as a callback to LocationList
+        this.locationList = new LocationList(
+            this.handleLocationClick.bind(this)
+        );
+    }
+
+    handleLocationClick(location) {
+        this.map.focusOnLocation(location);
     }
 
     async init() {

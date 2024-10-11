@@ -80,6 +80,15 @@ class Map {
         this.markers.forEach((marker) => marker.setMap(null));
         this.markers = [];
     }
+
+    focusOnLocation(location) {
+        const position = {
+            lat: Number(location.buildingLatitude),
+            lng: Number(location.buildingLongitude),
+        };
+        this.map.setZoom(10);
+        this.map.panTo(position);
+    }
 }
 
 export default Map;

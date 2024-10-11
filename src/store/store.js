@@ -10,14 +10,11 @@ const locationsSlice = createSlice({
     reducers: {
         setLocations: (state, action) => {
             state.data = action.payload;
-            console.log(`asdf state.data ${state.data}`);
         },
         setMapCenter: (state, action) => {
-            console.log(`asdf state.mapCenter ${state.mapCenter}`);
             state.mapCenter = action.payload;
         },
         setZoomLevel: (state, action) => {
-            console.log(`asdf state.zoomLevel ${state.zoomLevel}`);
             state.zoomLevel = action.payload;
         },
     },

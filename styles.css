@@ -9,23 +9,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-#map-explorer {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 20px;
-}
-
-#search-bar,
-#filter-bar {
-    grid-column: 1 / -1;
-    padding: 10px;
-    background: #f0f0f0;
-}
-
-#map {
-    grid-row: 2 / 4;
-}
-
 .list-and-map {
     display: flex;
 }
