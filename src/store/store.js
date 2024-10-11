@@ -20,7 +20,7 @@ const locationsSlice = createSlice({
     },
 });
 
-const store = configureStore({
+const store = configureStore({      
     reducer: {
         locations: locationsSlice.reducer,
     },
