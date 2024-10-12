@@ -22,22 +22,28 @@ class SearchBar {
                     { lat: lat(), lng: lng() },
                     this.mapInstance.zoomLevel
                 );
-                store.dispatch(setMapCenter({ lat: lat(), lng: lng() }));
+                this.onMapCenterChange({ lat: lat(), lng: lng() }); // {{ edit_1 }}
             } else {
                 alert("No details available for input: '" + place.name + "'");
             }
         });
     }
 
+    // Add a method to set the callback
+    setMapCenterChangeCallback(callback) {
+        // {{ edit_2 }}
+        this.onMapCenterChange = callback;
+    }
+
     setupEventListeners() {
         this.setupAutocomplete();
         document.getElementById('search-btn').addEventListener('click', () => {
-            const address = document.getElementById('search-input').value;
-            const zoomLevel = parseInt(
-                document.getElementById('zoom-level').value,
-                10
+            const input = document.getElementById('search-input').value;
+            console.log(
+                `this.autocomplete.getPlace() ${
+                    this.autocomplete.getPlace().geometry.location
+                }`
             );
-            this.mapInstance.searchLocation(address, zoomLevel);
         });
     }
 }

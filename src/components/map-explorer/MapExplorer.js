@@ -18,6 +18,12 @@ class MapExplorer {
         this.locationList = new LocationList(
             this.handleLocationClick.bind(this)
         );
+
+        this.handleMapCenterChange = (newCenter) => {
+            store.dispatch(setMapCenter(newCenter));
+        };
+
+        this.searchBar.setMapCenterChangeCallback(this.handleMapCenterChange);
     }
 
     handleLocationClick(location) {
