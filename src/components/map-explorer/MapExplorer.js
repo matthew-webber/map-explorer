@@ -32,7 +32,6 @@ class MapExplorer {
 
     async init() {
         const data = await this.fetchData();
-        console.log(`asdf data.locationsArray ${data.locationsArray}`);
         store.dispatch(setLocations(data.locationsArray));
         store.dispatch(
             setMapCenter({

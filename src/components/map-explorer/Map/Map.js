@@ -17,11 +17,8 @@ class Map {
     }
 
     subscribeToStore = () => {
-        console.log(`123subscribeToStore was just set up`);
         store.subscribe(() => {
-            console.log(`123 the store has been updated`);
             const state = store.getState();
-            console.log(`state: ${state}`);
             this.updateMap(
                 state.locations.mapCenter,
                 state.locations.zoomLevel
@@ -41,17 +38,11 @@ class Map {
         this.loader
             .load()
             .then(() => {
-                console.log(
-                    `foobar this.getState().locations.mapCenter: ${
-                        store.getState().locations.mapCenter
-                    }`
-                );
                 this.map = new google.maps.Map(document.getElementById('map'), {
                     center: store.getState().locations.mapCenter,
                     zoom: store.getState().locations.zoomLevel,
                     mapId: GOOGLE_MAP_ID,
                 });
-                console.log('Google Map has been initialized.');
             })
             .catch((e) => {
                 console.error('Error loading the Google Maps API:', e);
@@ -65,14 +56,12 @@ class Map {
                 lat: Number(location.buildingLatitude),
                 lng: Number(location.buildingLongitude),
             };
-            console.log('Marker position:', position);
             const marker = new google.maps.Marker({
                 position,
                 map: this.map,
                 title: location.locationName,
             });
             this.markers.push(marker);
-            console.log('Marker added:', marker);
         });
     }
 
