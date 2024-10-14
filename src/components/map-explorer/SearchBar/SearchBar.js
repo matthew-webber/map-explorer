@@ -36,7 +36,7 @@ class SearchBar {
     }
 
     setupEventListeners() {
-        this.setupAutocomplete();
+        // this.setupAutocomplete();
         document.getElementById('search-btn').addEventListener('click', () => {
             const input = document.getElementById('search-input').value;
             console.log(

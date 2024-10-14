@@ -8,6 +8,13 @@ import Map from './Map/Map.js';
 import SearchBar from './SearchBar/SearchBar.js';
 import Filter from './Filter/Filter.js';
 import LocationList from './LocationList/LocationList.js';
+import { Loader } from '@googlemaps/js-api-loader';
+
+const GOOGLE_MAPS_API_OPTIONS = {
+    apiKey: 'AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM', // Replace with your actual API key
+    version: 'weekly',
+    libraries: ['places', 'geometry', 'marker'],
+};
 
 class MapExplorer {
     constructor() {
@@ -31,7 +38,13 @@ class MapExplorer {
     }
 
     async init() {
+        const loader = new Loader(GOOGLE_MAPS_API_OPTIONS);
+        await loader.load();
+        // Initialize the map after the API has loaded
+        // this.map.init();
+
         const data = await this.fetchData();
+        console.log('google', { ...google });
         store.dispatch(setLocations(data.locationsArray));
         store.dispatch(
             setMapCenter({
@@ -49,7 +62,6 @@ class MapExplorer {
 
     async render() {
         await this.map.init();
-
         // this.searchBar.render();
         // this.filter.render();
         // this.locationList.render();

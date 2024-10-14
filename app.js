@@ -4,6 +4,6 @@ import MapExplorer from './src/components/map-explorer/MapExplorer.js';
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize the MapExplorer component when the DOM is fully loaded
     const mapExplorer = new MapExplorer();
-    await mapExplorer.render();
     await mapExplorer.init();
+    await mapExplorer.render();
 });
