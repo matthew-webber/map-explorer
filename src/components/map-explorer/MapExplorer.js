@@ -1,15 +1,14 @@
-import {
-    store,
-    setLocations,
-    setMapCenter,
-    setZoomLevel,
-    setSelectedLocation,
-} from '../../store/store.js';
+import { store } from '../../store/store.js';
 import Map from './Map/Map.js';
 import SearchBar from './SearchBar/SearchBar.js';
 import Filter from './Filter/Filter.js';
 import LocationList from './LocationList/LocationList.js';
 import { Loader } from '@googlemaps/js-api-loader';
+import { setLocations } from '../../store/locationsSlice.js';
+import { setMapCenter, setZoomLevel } from '../../store/mapSlice.js';
+import { setSelectedLocation } from '../../store/uiSlice.js';
+import { selectMapCenter, selectZoomLevel } from '../../store/mapSelectors.js';
+import { selectLocations } from '../../store/locationsSelectors.js';
 
 const GOOGLE_MAPS_API_OPTIONS = {
     apiKey: 'AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM', // Replace with your actual API key
@@ -36,8 +35,14 @@ class MapExplorer {
 
     handleLocationClick(location) {
         store.dispatch(setSelectedLocation(location));
+        store.dispatch(
+            setMapCenter({
+                lat: Number(location.buildingLatitude),
+                lng: Number(location.buildingLongitude),
+            })
+        );
+        store.dispatch(setZoomLevel(10)); // Example zoom level
         this.map.focusOnLocation(location);
-        // {{ edit_2 }}
     }
 
     async init() {
@@ -67,6 +72,13 @@ class MapExplorer {
         // this.searchBar.render();
         // this.filter.render();
         // this.locationList.render();
+
+        const state = store.getState();
+        const mapCenter = selectMapCenter(state);
+        const zoomLevel = selectZoomLevel(state);
+        const locations = selectLocations(state);
+        this.map.updateMap(mapCenter, zoomLevel);
+        this.map.addMarkers(locations);
     }
 }
 

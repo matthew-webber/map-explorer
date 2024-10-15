@@ -1,4 +1,10 @@
 import { store } from '../../../store/store';
+import {
+    selectMapCenter,
+    selectZoomLevel,
+} from '../../../store/mapSelectors.js';
+import { selectSelectedLocation } from '../../../store/uiSelectors.js';
+import { selectLocations } from '../../../store/locationsSelectors.js';
 
 const GOOGLE_MAP_ID = '9b8ee480625b2419'; // Replace with your actual Map ID
 
@@ -13,11 +19,11 @@ class Map {
     subscribeToStore = () => {
         store.subscribe(() => {
             const state = store.getState();
-            this.updateMap(
-                state.locations.mapCenter,
-                state.locations.zoomLevel
-            );
-            this.highlightMarker(state.locations.selectedLocation);
+            const mapCenter = selectMapCenter(state);
+            const zoomLevel = selectZoomLevel(state);
+            const selectedLocation = selectSelectedLocation(state);
+            this.updateMap(mapCenter, zoomLevel);
+            this.highlightMarker(selectedLocation);
         });
     };
 
@@ -30,8 +36,8 @@ class Map {
 
     async init() {
         this.map = await new google.maps.Map(document.querySelector('#map'), {
-            center: store.getState().locations.mapCenter,
-            zoom: store.getState().locations.zoomLevel,
+            center: selectMapCenter(store.getState()),
+            zoom: selectZoomLevel(store.getState()),
             mapId: GOOGLE_MAP_ID,
         });
         this.subscribeToStore();
@@ -40,8 +46,11 @@ class Map {
 
         // Handle initial state
         const state = store.getState();
-        this.updateMap(state.locations.mapCenter, state.locations.zoomLevel);
-        this.addMarkers(state.locations.data);
+        const mapCenter = selectMapCenter(state);
+        const zoomLevel = selectZoomLevel(state);
+        const locations = selectLocations(state);
+        this.updateMap(mapCenter, zoomLevel);
+        this.addMarkers(locations);
     }
 
     async loadPinMarkup() {
@@ -56,7 +65,7 @@ class Map {
 
     addMarkers(locations) {
         this.clearMarkers();
-        const selectedLocation = store.getState().locations.selectedLocation;
+        const selectedLocation = selectSelectedLocation(store.getState());
         locations.forEach((location) => {
             const isSelected =
                 selectedLocation &&
@@ -88,7 +97,7 @@ class Map {
     }
 
     clearMarkers() {
-        this.markers.forEach((marker) => marker.setMap(null));
+        this.markers.forEach((marker) => marker.element.setMap(null));
         this.markers = [];
     }
 

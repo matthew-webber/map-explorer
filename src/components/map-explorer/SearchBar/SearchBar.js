@@ -1,4 +1,6 @@
 import { store } from '../../../store/store'; // Import the store
+import { setMapCenter } from '../../../store/mapSlice.js';
+import { selectMapCenter } from '../../../store/mapSelectors.js';
 
 class SearchBar {
     constructor(mapInstance) {
@@ -22,7 +24,7 @@ class SearchBar {
                     { lat: lat(), lng: lng() },
                     this.mapInstance.zoomLevel
                 );
-                this.onMapCenterChange({ lat: lat(), lng: lng() }); // {{ edit_1 }}
+                this.onMapCenterChange({ lat: lat(), lng: lng() });
             } else {
                 alert("No details available for input: '" + place.name + "'");
             }
@@ -31,7 +33,6 @@ class SearchBar {
 
     // Add a method to set the callback
     setMapCenterChangeCallback(callback) {
-        // {{ edit_2 }}
         this.onMapCenterChange = callback;
     }
 
