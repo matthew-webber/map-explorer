@@ -44,7 +44,6 @@ class MapExplorer {
         // this.map.init();
 
         const data = await this.fetchData();
-        console.log('google', { ...google });
         store.dispatch(setLocations(data.locationsArray));
         store.dispatch(
             setMapCenter({
