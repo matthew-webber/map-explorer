@@ -6,6 +6,7 @@ const locationsSlice = createSlice({
         data: [],
         mapCenter: { lat: 32.7833, lng: -79.932 },
         zoomLevel: 7,
+        selectedLocation: null,
     },
     reducers: {
         setLocations: (state, action) => {
@@ -17,6 +18,9 @@ const locationsSlice = createSlice({
         setZoomLevel: (state, action) => {
             state.zoomLevel = action.payload;
         },
+        setSelectedLocation: (state, action) => {
+            state.selectedLocation = action.payload;
+        },
     },
 });
 
@@ -26,6 +30,6 @@ const store = configureStore({
     },
 });
 
-const { setLocations, setMapCenter, setZoomLevel } = locationsSlice.actions;
+const { setLocations, setMapCenter, setZoomLevel, setSelectedLocation } = locationsSlice.actions;
 
-export { store, setLocations, setMapCenter, setZoomLevel };
+export { store, setLocations, setMapCenter, setZoomLevel, setSelectedLocation };

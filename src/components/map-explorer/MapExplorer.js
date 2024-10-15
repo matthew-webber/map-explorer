@@ -3,6 +3,7 @@ import {
     setLocations,
     setMapCenter,
     setZoomLevel,
+    setSelectedLocation,
 } from '../../store/store.js';
 import Map from './Map/Map.js';
 import SearchBar from './SearchBar/SearchBar.js';
@@ -34,7 +35,9 @@ class MapExplorer {
     }
 
     handleLocationClick(location) {
+        store.dispatch(setSelectedLocation(location));
         this.map.focusOnLocation(location);
+        // {{ edit_2 }}
     }
 
     async init() {

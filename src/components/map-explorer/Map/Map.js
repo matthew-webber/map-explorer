@@ -4,7 +4,7 @@ const GOOGLE_MAP_ID = '9b8ee480625b2419'; // Replace with your actual Map ID
 
 import pinURL from './pin.svg';
 
-let simpleMapPin = null;
+let mapPin = null;
 class Map {
     constructor() {
         this.markers = [];
@@ -17,7 +17,7 @@ class Map {
                 state.locations.mapCenter,
                 state.locations.zoomLevel
             );
-            this.addMarkers(state.locations.data);
+            this.highlightMarker(state.locations.selectedLocation);
         });
     };
 
@@ -29,20 +29,14 @@ class Map {
     }
 
     async init() {
-        this.map = await new google.maps.Map(document.getElementById('map'), {
+        this.map = await new google.maps.Map(document.querySelector('#map'), {
             center: store.getState().locations.mapCenter,
             zoom: store.getState().locations.zoomLevel,
             mapId: GOOGLE_MAP_ID,
         });
         this.subscribeToStore();
 
-        const response = await fetch(pinURL);
-        const pinText = await response.text();
-
-        simpleMapPin = new DOMParser().parseFromString(
-            pinText,
-            'image/svg+xml'
-        ).documentElement;
+        await this.loadPinMarkup();
 
         // Handle initial state
         const state = store.getState();
@@ -50,25 +44,46 @@ class Map {
         this.addMarkers(state.locations.data);
     }
 
+    async loadPinMarkup() {
+        const response = await fetch(pinURL);
+        const pinText = await response.text();
+
+        mapPin = new DOMParser().parseFromString(
+            pinText,
+            'image/svg+xml'
+        ).documentElement;
+    }
+
     addMarkers(locations) {
-        this.clearMarkers(); // Clear existing markers before adding new ones
+        this.clearMarkers();
+        const selectedLocation = store.getState().locations.selectedLocation;
         locations.forEach((location) => {
+            const isSelected =
+                selectedLocation &&
+                location.locationId === selectedLocation.locationId;
             const position = {
                 lat: Number(location.buildingLatitude),
                 lng: Number(location.buildingLongitude),
             };
 
-            const copyofsimpleMapPin = simpleMapPin.cloneNode(true);
+            const copyOfMapPin = mapPin.cloneNode(true);
 
-            console.log(`copyofsimpleMapPin`, copyofsimpleMapPin);
+            // NOTE - not currently used -- for possible implementation of "selected/highlighted pins" on initial load
+            if (isSelected) {
+                copyOfMapPin.classList.add('selected');
+            }
 
-            const marker = new google.maps.marker.AdvancedMarkerElement({
+            const markerElement = new google.maps.marker.AdvancedMarkerElement({
                 position,
                 map: this.map,
                 title: location.locationName,
-                content: copyofsimpleMapPin,
+                content: copyOfMapPin,
             });
-            this.markers.push(marker);
+
+            this.markers.push({
+                id: location.locationId,
+                element: markerElement,
+            });
         });
     }
 
@@ -77,7 +92,26 @@ class Map {
         this.markers = [];
     }
 
+    highlightMarker(location) {
+        if (!location) {
+            console.log(`No location to highlight`);
+            return;
+        }
+
+        // TODO - refactor for clustering when implementing
+        this.markers.forEach((marker) => {
+            if (marker.id === location.locationId) {
+                marker.element.content.classList.add('selected');
+                marker.element.zIndex = 100;
+            } else {
+                marker.element.content.classList.remove('selected');
+                marker.element.zIndex = null;
+            }
+        });
+    }
+
     focusOnLocation(location) {
+        console.log(`Focusing on location: ${location.locationName}`);
         const position = {
             lat: Number(location.buildingLatitude),
             lng: Number(location.buildingLongitude),
