@@ -4,11 +4,23 @@ import SearchBar from './SearchBar/SearchBar.js';
 import Filter from './Filter/Filter.js';
 import LocationList from './LocationList/LocationList.js';
 import { Loader } from '@googlemaps/js-api-loader';
-import { setLocations } from '../../store/locationsSlice.js';
-import { setMapCenter, setZoomLevel } from '../../store/mapSlice.js';
+import { selectSelectedLocation } from '../../store/uiSelectors.js';
+import { updateLocation } from '../../store/actions.js'; // Import the new action
+
+// import { setMapCenter, setZoomLevel } from '../../store/mapSlice.js';
+import {
+    setLocations,
+    toggleLocationsChanged,
+    selectLocations,
+    selectLocationsChanged,
+} from '../../store/locationsSlice.js';
+import {
+    selectMapCenter,
+    selectZoomLevel,
+    setMapCenter,
+    setZoomLevel,
+} from '../../store/mapSlice.js';
 import { setSelectedLocation } from '../../store/uiSlice.js';
-import { selectMapCenter, selectZoomLevel } from '../../store/mapSelectors.js';
-import { selectLocationsList } from '../../store/locationsSelectors.js';
 
 const GOOGLE_MAPS_API_OPTIONS = {
     apiKey: 'AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM', // Replace with your actual API key
@@ -22,9 +34,8 @@ class MapExplorer {
         this.searchBar = new SearchBar(this.map);
         this.filter = new Filter(this.map);
         // Pass the handleLocationClick method as a callback to LocationList
-        this.locationList = new LocationList(
-            this.handleLocationClick.bind(this)
-        );
+        this.locationList = new LocationList();
+        // this.handleLocationClick.bind(this)
 
         this.handleMapCenterChange = (newCenter) => {
             store.dispatch(setMapCenter(newCenter));
@@ -33,34 +44,75 @@ class MapExplorer {
         this.searchBar.setMapCenterChangeCallback(this.handleMapCenterChange);
     }
 
+    // TODO - remove
+    debounce(func, wait, label) {
+        let timeout;
+        let counter = 0;
+
+        return function (...args) {
+            const context = this;
+            const later = function () {
+                console.log(`⏱️ Total ${label} in window: ${counter}`);
+                timeout = null;
+                counter = 0;
+            };
+
+            if (!timeout) {
+                timeout = setTimeout(later, wait);
+                counter++;
+                return func.apply(context, args);
+            } else {
+                clearTimeout(timeout);
+                counter++;
+                timeout = setTimeout(later, wait);
+                return counter;
+            }
+        };
+    }
+
+    // TODO - remove
+    debounced = this.debounce(
+        (label) => {
+            console.log(`🔔 Debounced: ${label}`);
+        },
+        1000,
+        'render'
+    );
+
+    subscribeToStore = () => {
+        store.subscribe(() => {
+            this.debounced('renders caused by store change');
+            this.render();
+        });
+    };
+
     handleLocationClick(location) {
-        store.dispatch(setSelectedLocation(location));
         store.dispatch(
-            setMapCenter({
-                lat: Number(location.buildingLatitude),
-                lng: Number(location.buildingLongitude),
+            updateLocation({
+                location,
+                latitude: location.buildingLatitude,
+                longitude: location.buildingLongitude,
+                zoomLevel: 10,
             })
         );
-        store.dispatch(setZoomLevel(10)); // Example zoom level
-        // ... existing code ...
-        // this.map.focusOnLocation(location); // Removed direct call
     }
 
     async init() {
         const loader = new Loader(GOOGLE_MAPS_API_OPTIONS);
         await loader.load();
-        // Initialize the map after the API has loaded
-        // this.map.init();
 
         const data = await this.fetchData();
         store.dispatch(setLocations(data.locationsArray));
-        store.dispatch(
-            setMapCenter({
+
+        await this.map.init(
+            {
                 lat: Number(data.latitude),
                 lng: Number(data.longitude),
-            })
+            },
+            Number(data.zoomLevel)
         );
-        store.dispatch(setZoomLevel(Number(data.zoomLevel)));
+
+        this.locationList.init(data.locationsArray, this.handleLocationClick);
     }
 
     async fetchData() {
@@ -69,17 +121,21 @@ class MapExplorer {
     }
 
     async render() {
-        await this.map.init();
-        // this.searchBar.render();
-        // this.filter.render();
-        // this.locationList.render();
-
         const state = store.getState();
         const mapCenter = selectMapCenter(state);
         const zoomLevel = selectZoomLevel(state);
-        const locations = selectLocationsList(state);
+        const locations = selectLocations(state);
+        const locationsChanged = selectLocationsChanged(state);
+        const selectedLocation = selectSelectedLocation(state);
+
+        // console.log(`locationsChanged`, locationsChanged);
         this.map.updateMap(mapCenter, zoomLevel);
-        this.map.addMarkers(locations);
+
+        if (locationsChanged) {
+            this.map.addMarkers(locations, selectedLocation);
+
+            store.dispatch(toggleLocationsChanged());
+        }
     }
 }
 

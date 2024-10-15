@@ -1,10 +1,9 @@
 import { store } from '../../../store/store';
-import {
-    selectMapCenter,
-    selectZoomLevel,
-} from '../../../store/mapSelectors.js';
-import { selectSelectedLocation } from '../../../store/uiSelectors.js';
-import { selectLocationsList } from '../../../store/locationsSelectors.js';
+// import {
+//     selectMapCenter,
+//     selectZoomLevel,
+// } from '../../../store/mapSelectors.js';
+// import { selectLocations } from '../../../store/locationsSelectors.js';
 
 const GOOGLE_MAP_ID = '9b8ee480625b2419'; // Replace with your actual Map ID
 
@@ -17,15 +16,15 @@ class Map {
     }
 
     subscribeToStore = () => {
-        store.subscribe(() => {
-            const state = store.getState();
-            const mapCenter = selectMapCenter(state);
-            const zoomLevel = selectZoomLevel(state);
-            const selectedLocation = selectSelectedLocation(state);
-            this.updateMap(mapCenter, zoomLevel);
-            this.highlightMarker(selectedLocation);
-            this.focusOnLocation(selectedLocation); // Added invocation based on state
-        });
+        // store.subscribe(() => {
+        //     const state = store.getState();
+        //     const mapCenter = selectMapCenter(state);
+        //     const zoomLevel = selectZoomLevel(state);
+        //     const selectedLocation = selectSelectedLocation(state);
+        //     this.updateMap(mapCenter, zoomLevel);
+        //     this.highlightMarker(selectedLocation);
+        //     this.focusOnLocation(selectedLocation); // Added invocation based on state
+        // });
     };
 
     updateMap(center, zoom) {
@@ -35,23 +34,17 @@ class Map {
         }
     }
 
-    async init() {
+    async init(center, zoom) {
+        console.log(
+            `Initializing map with center: ${center.lat}, ${center.lng}`
+        );
         this.map = await new google.maps.Map(document.querySelector('#map'), {
-            center: selectMapCenter(store.getState()),
-            zoom: selectZoomLevel(store.getState()),
+            center: center,
+            zoom: zoom,
             mapId: GOOGLE_MAP_ID,
         });
         this.subscribeToStore();
-
         await this.loadPinMarkup();
-
-        // Handle initial state
-        const state = store.getState();
-        const mapCenter = selectMapCenter(state);
-        const zoomLevel = selectZoomLevel(state);
-        const locations = selectLocationsList(state);
-        this.updateMap(mapCenter, zoomLevel);
-        this.addMarkers(locations);
     }
 
     async loadPinMarkup() {
@@ -64,9 +57,11 @@ class Map {
         ).documentElement;
     }
 
-    addMarkers(locations) {
+    addMarkers(locations, selectedLocation) {
+        console.log(`this.mapp444n`, mapPin);
         this.clearMarkers();
-        const selectedLocation = selectSelectedLocation(store.getState());
+        console.log(`Adding markers for ${locations.length} locations`);
+        // const selectedLocation = selectSelectedLocation(store.getState());
         locations.forEach((location) => {
             const isSelected =
                 selectedLocation &&

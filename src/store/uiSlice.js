@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { updateLocation } from './actions.js'; // Import the new action
 
 const uiSlice = createSlice({
     name: 'ui',
@@ -9,6 +10,12 @@ const uiSlice = createSlice({
         setSelectedLocation: (state, action) => {
             state.selectedLocation = action.payload;
         },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(updateLocation, (state, action) => {
+            const { location } = action.payload;
+            state.selectedLocation = location;
+        });
     },
 });
 

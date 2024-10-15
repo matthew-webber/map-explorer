@@ -1,6 +1,6 @@
-import { store } from '../../../store/store'; // Import the store
-import { setMapCenter } from '../../../store/mapSlice.js';
-import { selectMapCenter } from '../../../store/mapSelectors.js';
+// import { store } from '../../../store/store'; // Import the store
+// import { setMapCenter } from '../../../store/mapSlice.js';
+// import { selectMapCenter } from '../../../store/mapSelectors.js';
 
 class SearchBar {
     constructor(mapInstance) {

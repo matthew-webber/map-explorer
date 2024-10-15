@@ -6,4 +6,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     const mapExplorer = new MapExplorer();
     await mapExplorer.init();
     await mapExplorer.render();
+    mapExplorer.subscribeToStore();
 });
