@@ -12,3 +12,15 @@
 .list-and-map {
     display: flex;
 }
+
+.map-pin {
+    stroke: rgb(138, 2, 2);
+    fill: rgb(255, 79, 79);
+    stroke-width: 2;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.map-pin:hover {
+    transform: scale(1.2);
+}

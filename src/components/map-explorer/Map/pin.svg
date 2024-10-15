@@ -3,12 +3,9 @@
     width="24"
     height="24"
     viewBox="0 0 24 24"
-    fill="#0002"
-    stroke="currentColor"
-    stroke-width="2"
     stroke-linecap="round"
     stroke-linejoin="round"
-    class="feather feather-map-pin"
+    class="map-pin"
 >
     <path
         d="M12 2c-4.418 0-8 3.582-8 8 0 5.25 8 14 8 14s8-8.75 8-14c0-4.418-3.582-8-8-8z"
