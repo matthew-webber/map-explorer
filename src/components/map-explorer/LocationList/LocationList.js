@@ -1,6 +1,6 @@
 import { store } from '../../../store/store'; // Import the store
 import { setSelectedLocation } from '../../../store/uiSlice.js';
-import { selectLocations } from '../../../store/locationsSelectors.js';
+import { selectLocationsList } from '../../../store/locationsSelectors.js';
 
 class LocationList {
     // Modify the constructor to accept a click handler
@@ -8,16 +8,23 @@ class LocationList {
         this.listContainer = document.querySelector('#location-list');
         this.onLocationClick = onLocationClick;
         this.subscribeToStore(); // Initialize the store subscription
+        this.prevLocations = null; // Initialize previous locations
     }
 
     subscribeToStore = () => {
         store.subscribe(() => {
-            const locations = selectLocations(store.getState());
-            this.updateList(locations);
+            const locations = selectLocationsList(store.getState());
+            if (locations !== this.prevLocations) {
+                console.warn(
+                    `locations have changed: ${locations.length} locations`
+                );
+                this.renderList(locations);
+                this.prevLocations = locations; // Update previous locations
+            }
         });
     };
 
-    updateList(locations) {
+    renderList(locations) {
         this.listContainer.innerHTML = ''; // Clear existing entries
         locations.forEach((location) => {
             const listItem = document.createElement('div');

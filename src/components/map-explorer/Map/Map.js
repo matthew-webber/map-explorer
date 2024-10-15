@@ -4,7 +4,7 @@ import {
     selectZoomLevel,
 } from '../../../store/mapSelectors.js';
 import { selectSelectedLocation } from '../../../store/uiSelectors.js';
-import { selectLocations } from '../../../store/locationsSelectors.js';
+import { selectLocationsList } from '../../../store/locationsSelectors.js';
 
 const GOOGLE_MAP_ID = '9b8ee480625b2419'; // Replace with your actual Map ID
 
@@ -24,6 +24,7 @@ class Map {
             const selectedLocation = selectSelectedLocation(state);
             this.updateMap(mapCenter, zoomLevel);
             this.highlightMarker(selectedLocation);
+            this.focusOnLocation(selectedLocation); // Added invocation based on state
         });
     };
 
@@ -48,7 +49,7 @@ class Map {
         const state = store.getState();
         const mapCenter = selectMapCenter(state);
         const zoomLevel = selectZoomLevel(state);
-        const locations = selectLocations(state);
+        const locations = selectLocationsList(state);
         this.updateMap(mapCenter, zoomLevel);
         this.addMarkers(locations);
     }
@@ -120,13 +121,15 @@ class Map {
     }
 
     focusOnLocation(location) {
-        console.log(`Focusing on location: ${location.locationName}`);
-        const position = {
-            lat: Number(location.buildingLatitude),
-            lng: Number(location.buildingLongitude),
-        };
-        this.map.setZoom(10);
-        this.map.panTo(position);
+        if (location) {
+            console.log(`Focusing on location: ${location.locationName}`);
+            const position = {
+                lat: Number(location.buildingLatitude),
+                lng: Number(location.buildingLongitude),
+            };
+            this.map.setZoom(10);
+            this.map.panTo(position);
+        }
     }
 }
 

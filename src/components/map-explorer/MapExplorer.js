@@ -8,7 +8,7 @@ import { setLocations } from '../../store/locationsSlice.js';
 import { setMapCenter, setZoomLevel } from '../../store/mapSlice.js';
 import { setSelectedLocation } from '../../store/uiSlice.js';
 import { selectMapCenter, selectZoomLevel } from '../../store/mapSelectors.js';
-import { selectLocations } from '../../store/locationsSelectors.js';
+import { selectLocationsList } from '../../store/locationsSelectors.js';
 
 const GOOGLE_MAPS_API_OPTIONS = {
     apiKey: 'AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM', // Replace with your actual API key
@@ -42,7 +42,8 @@ class MapExplorer {
             })
         );
         store.dispatch(setZoomLevel(10)); // Example zoom level
-        this.map.focusOnLocation(location);
+        // ... existing code ...
+        // this.map.focusOnLocation(location); // Removed direct call
     }
 
     async init() {
@@ -76,7 +77,7 @@ class MapExplorer {
         const state = store.getState();
         const mapCenter = selectMapCenter(state);
         const zoomLevel = selectZoomLevel(state);
-        const locations = selectLocations(state);
+        const locations = selectLocationsList(state);
         this.map.updateMap(mapCenter, zoomLevel);
         this.map.addMarkers(locations);
     }

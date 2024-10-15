@@ -3,11 +3,11 @@ import { createSlice } from '@reduxjs/toolkit';
 const locationsSlice = createSlice({
     name: 'locations',
     initialState: {
-        data: [],
+        locationsList: [],
     },
     reducers: {
         setLocations: (state, action) => {
-            state.data = action.payload;
+            state.locationsList = action.payload;
         },
     },
 });
