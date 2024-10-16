@@ -13,18 +13,6 @@ class Map {
         this.unsubscribe = null; // To manage store subscription
     }
 
-    subscribeToStore = () => {
-        // store.subscribe(() => {
-        //     const state = store.getState();
-        //     const mapCenter = selectMapCenter(state);
-        //     const zoomLevel = selectZoomLevel(state);
-        //     const selectedLocation = selectSelectedLocation(state);
-        //     this.updateMap(mapCenter, zoomLevel);
-        //     this.highlightMarker(selectedLocation);
-        //     this.focusOnLocation(selectedLocation); // Added invocation based on state
-        // });
-    };
-
     updateMap(center, zoom) {
         console.log(`Updating map with center: ${center.lat}, ${center.lng}`);
         if (this.map) {
@@ -52,7 +40,6 @@ class Map {
             minZoom: zoom,
             mapId: GOOGLE_MAP_ID,
         });
-        this.subscribeToStore();
         await this.loadPinMarkup();
     }
 
