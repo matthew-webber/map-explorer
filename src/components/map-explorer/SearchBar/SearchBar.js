@@ -20,7 +20,7 @@ class SearchBar {
             const place = this.autocomplete.getPlace();
             if (place.geometry) {
                 const { lat, lng } = place.geometry.location;
-                this.mapInstance.updateMap(
+                this.mapInstance.update(
                     { lat: lat(), lng: lng() },
                     this.mapInstance.zoomLevel
                 );

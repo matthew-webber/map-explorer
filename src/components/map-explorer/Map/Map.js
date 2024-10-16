@@ -1,24 +1,38 @@
 import { store } from '../../../store/store';
-import { selectMapCenter, selectZoomLevel } from '../../../store/mapSlice.js'; // Import selectors
+import {
+    selectMapCenter,
+    selectZoomLevel,
+    selectMapBounds,
+    setMapCenter,
+    setZoomLevel,
+    setMapBounds,
+} from '../../../store/mapSlice.js'; // Import selectors
 // import { selectLocations } from '../../../store/locationsSelectors.js';
+import { debounce } from '../../../utils/debounce.js';
 
 const GOOGLE_MAP_ID = '9b8ee480625b2419'; // Replace with your actual Map ID
 
 import pinURL from './pin.svg';
+import { updateLocation } from '../../../store/actions';
 
 let mapPin = null;
+
 class Map {
     constructor() {
         this.markers = [];
-        this.unsubscribe = null; // To manage store subscription
+        this.unsubscribe = null;
+        this.widget = null;
+        this.current = {
+            center: { lat: null, lng: null },
+            zoom: null,
+        };
     }
 
-    updateMap(center, zoom) {
+    update(center, zoom) {
         console.log(`Updating map with center: ${center.lat}, ${center.lng}`);
-        if (this.map) {
-            console.log(`center is`, { ...center });
-            this.map.setZoom(zoom);
-            this.map.panTo(center);
+        if (this.widget) {
+            // this.widget.setZoom(zoom);
+            // this.widget.panTo(center);
         }
     }
 
@@ -30,24 +44,69 @@ class Map {
         const state = store.getState();
         const center = selectMapCenter(state);
         const zoom = selectZoomLevel(state);
+        // const bounds = selectMapBounds(state); // Get initial bounds if needed
 
         console.log(
-            `Initializing map with center: ${center.lat}, ${center.lng}`
+            `Initializing map with center: ${center.lat}, ${center.lng} and zoom: ${zoom}`
         );
-        this.map = await new google.maps.Map(document.querySelector('#map'), {
-            center: center,
-            zoom: zoom,
-            minZoom: zoom,
-            mapId: GOOGLE_MAP_ID,
-        });
+        this.widget = await new google.maps.Map(
+            document.querySelector('#map'),
+            {
+                center: center,
+                zoom: zoom,
+                minZoom: zoom,
+                mapId: GOOGLE_MAP_ID,
+            }
+        );
+
+        this.widget.addListener('idle', () => this.updateMapLocation());
+
+        this.widget.addListener('zoom_changed', () =>
+            console.log(`zoom_changed`)
+        );
+
         await this.loadPinMarkup();
+    }
+
+    updateMapLocation() {
+        console.log(`Updating map location`);
+        console.log(
+            '🚀🚀🚀 ----------------------------------------------------------------------------------------🚀🚀🚀'
+        );
+        console.log(
+            '🚀🚀🚀 ~ file: Map.js:69 ~ updateMapLocation ~ updateMapLocation🚀🚀🚀'
+        );
+        console.log(
+            '🚀🚀🚀 ----------------------------------------------------------------------------------------🚀🚀🚀'
+        );
+
+        const zoom = this.widget.getZoom();
+        const center = this.widget.getCenter();
+        const bounds = this.widget.getBounds();
+
+        store.dispatch(
+            updateLocation({
+                latitude: center.lat(),
+                longitude: center.lng(),
+                zoomLevel: zoom,
+                bounds: bounds.toJSON(),
+            })
+        );
     }
 
     handleStoreChange = () => {
         const state = store.getState();
         const center = selectMapCenter(state);
         const zoom = selectZoomLevel(state);
-        this.updateMap(center, zoom);
+
+        if (
+            this.current.center.lat !== center.lat ||
+            this.current.center.lng !== center.lng ||
+            this.current.zoom !== zoom
+        ) {
+            this.current = { center, zoom };
+            this.update(center, zoom);
+        }
     };
 
     async loadPinMarkup() {
@@ -80,7 +139,7 @@ class Map {
 
             const markerElement = new google.maps.marker.AdvancedMarkerElement({
                 position,
-                map: this.map,
+                map: this.widget,
                 title: location.locationName,
                 content: copyOfMapPin,
             });
@@ -115,6 +174,14 @@ class Map {
         });
     }
 
+    getAllMapWidgetSpatialData() {
+        return {
+            bounds: this.widget.getBounds(),
+            zoom: this.widget.getZoom(),
+            center: this.widget.getCenter(),
+        };
+    }
+
     focusOnLocation(location) {
         if (location) {
             console.log(`Focusing on location: ${location.locationName}`);
@@ -122,8 +189,8 @@ class Map {
                 lat: Number(location.buildingLatitude),
                 lng: Number(location.buildingLongitude),
             };
-            this.map.setZoom(10);
-            this.map.panTo(position);
+            this.widget.setZoom(10);
+            this.widget.panTo(position);
         }
     }
 

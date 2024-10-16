@@ -7,4 +7,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     await mapExplorer.init();
     await mapExplorer.render();
     mapExplorer.subscribeToStore();
+    setTimeout(() => {
+        const { bounds, zoom, center } =
+            mapExplorer.map.getAllMapWidgetSpatialData();
+        // set input values of matching inputs with ids of 'bounds', 'zoom', and 'center' to the values of bounds, zoom, and center
+        document.getElementById('bounds').value = JSON.stringify(bounds);
+        document.getElementById('zoom-level').value = zoom;
+        document.getElementById('center').value = JSON.stringify(center);
+    }, 1000);
 });

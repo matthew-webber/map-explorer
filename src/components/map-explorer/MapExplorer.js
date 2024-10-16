@@ -19,6 +19,7 @@ import {
     selectZoomLevel,
     setMapCenter,
     setZoomLevel,
+    selectMapBounds,
 } from '../../store/mapSlice.js';
 import { setSelectedLocation } from '../../store/uiSlice.js';
 
@@ -105,6 +106,12 @@ class MapExplorer {
         );
 
         await this.map.init();
+        console.log(`Map bounds are`, this.map.widget.getBounds());
+
+        // console.log(`Map bounds are`, this.map.widget.getBounds());
+        // console.log(`Map zoom are`, this.map.widget.getZoom());
+        // console.log(`Map center are`, this.map.widget.getCenter());
+        // this.map.widget.addListener('bounds_changed', console.log(`bounds_changed`));
 
         this.locationList.init(data.locationsArray, this.handleLocationClick);
     }
@@ -118,12 +125,27 @@ class MapExplorer {
         const state = store.getState();
         const mapCenter = selectMapCenter(state);
         const zoomLevel = selectZoomLevel(state);
+        const mapBounds = selectMapBounds(state);
         const locations = selectLocations(state);
+
+        console.log(
+            '🚀🚀🚀 ----------------------------------------------------------------------🚀🚀🚀'
+        );
+        console.log(
+            '🚀🚀🚀 ~ file: MapExplorer.js:131 ~ render ~ mapCenter, zoomLevel, mapBounds',
+            mapCenter,
+            zoomLevel,
+            mapBounds
+        );
+        console.log(
+            '🚀🚀🚀 ----------------------------------------------------------------------🚀🚀🚀'
+        );
+
         const locationsChanged = selectLocationsChanged(state);
         const selectedLocation = selectSelectedLocation(state);
 
         // console.log(`locationsChanged`, locationsChanged);
-        // this.map.updateMap(mapCenter, zoomLevel);
+        // this.map.update(mapCenter, zoomLevel);
 
         if (locationsChanged) {
             console.log(`🍕: locations have changed`);
@@ -131,6 +153,17 @@ class MapExplorer {
 
             store.dispatch(toggleLocationsChanged());
         }
+
+        // this.addGetMapWidgetBoundsButtonToDom();
+    }
+
+    addGetMapWidgetBoundsButtonToDom() {
+        const button = document.createElement('button');
+        button.innerText = 'Get Map Widget Bounds';
+        button.addEventListener('click', () => {
+            console.log(`Map bounds are`, this.map.widget.getBounds());
+        });
+        document.body.appendChild(button);
     }
 }
 
