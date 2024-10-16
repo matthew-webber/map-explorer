@@ -1,8 +1,5 @@
 import { store } from '../../../store/store';
-// import {
-//     selectMapCenter,
-//     selectZoomLevel,
-// } from '../../../store/mapSelectors.js';
+import { selectMapCenter, selectZoomLevel } from '../../../store/mapSlice.js'; // Import selectors
 // import { selectLocations } from '../../../store/locationsSelectors.js';
 
 const GOOGLE_MAP_ID = '9b8ee480625b2419'; // Replace with your actual Map ID
@@ -13,6 +10,7 @@ let mapPin = null;
 class Map {
     constructor() {
         this.markers = [];
+        this.unsubscribe = null; // To manage store subscription
     }
 
     subscribeToStore = () => {
@@ -28,24 +26,42 @@ class Map {
     };
 
     updateMap(center, zoom) {
+        console.log(`Updating map with center: ${center.lat}, ${center.lng}`);
         if (this.map) {
-            this.map.setCenter(center);
+            console.log(`center is`, { ...center });
             this.map.setZoom(zoom);
+            this.map.panTo(center);
         }
     }
 
-    async init(center, zoom) {
+    async init() {
+        // Subscribe to the Redux store
+        this.unsubscribe = store.subscribe(this.handleStoreChange);
+
+        // Initialize the map with current state
+        const state = store.getState();
+        const center = selectMapCenter(state);
+        const zoom = selectZoomLevel(state);
+
         console.log(
             `Initializing map with center: ${center.lat}, ${center.lng}`
         );
         this.map = await new google.maps.Map(document.querySelector('#map'), {
             center: center,
             zoom: zoom,
+            minZoom: zoom,
             mapId: GOOGLE_MAP_ID,
         });
         this.subscribeToStore();
         await this.loadPinMarkup();
     }
+
+    handleStoreChange = () => {
+        const state = store.getState();
+        const center = selectMapCenter(state);
+        const zoom = selectZoomLevel(state);
+        this.updateMap(center, zoom);
+    };
 
     async loadPinMarkup() {
         const response = await fetch(pinURL);
@@ -58,10 +74,7 @@ class Map {
     }
 
     addMarkers(locations, selectedLocation) {
-        console.log(`this.mapp444n`, mapPin);
         this.clearMarkers();
-        console.log(`Adding markers for ${locations.length} locations`);
-        // const selectedLocation = selectSelectedLocation(store.getState());
         locations.forEach((location) => {
             const isSelected =
                 selectedLocation &&
@@ -124,6 +137,12 @@ class Map {
             };
             this.map.setZoom(10);
             this.map.panTo(position);
+        }
+    }
+
+    destroy() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
         }
     }
 }

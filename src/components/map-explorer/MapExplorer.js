@@ -33,55 +33,47 @@ class MapExplorer {
         this.map = new Map();
         this.searchBar = new SearchBar(this.map);
         this.filter = new Filter(this.map);
-        // Pass the handleLocationClick method as a callback to LocationList
         this.locationList = new LocationList();
-        // this.handleLocationClick.bind(this)
-
-        this.handleMapCenterChange = (newCenter) => {
-            store.dispatch(setMapCenter(newCenter));
-        };
-
-        this.searchBar.setMapCenterChangeCallback(this.handleMapCenterChange);
     }
 
     // TODO - remove
-    debounce(func, wait, label) {
-        let timeout;
-        let counter = 0;
+    // debounce(func, wait, label) {
+    //     let timeout;
+    //     let counter = 0;
 
-        return function (...args) {
-            const context = this;
-            const later = function () {
-                console.log(`⏱️ Total ${label} in window: ${counter}`);
-                timeout = null;
-                counter = 0;
-            };
+    //     return function (...args) {
+    //         const context = this;
+    //         const later = function () {
+    //             console.log(`⏱️ Total ${label} in window: ${counter}`);
+    //             timeout = null;
+    //             counter = 0;
+    //         };
 
-            if (!timeout) {
-                timeout = setTimeout(later, wait);
-                counter++;
-                return func.apply(context, args);
-            } else {
-                clearTimeout(timeout);
-                counter++;
-                timeout = setTimeout(later, wait);
-                return counter;
-            }
-        };
-    }
+    //         if (!timeout) {
+    //             timeout = setTimeout(later, wait);
+    //             counter++;
+    //             return func.apply(context, args);
+    //         } else {
+    //             clearTimeout(timeout);
+    //             counter++;
+    //             timeout = setTimeout(later, wait);
+    //             return counter;
+    //         }
+    //     };
+    // }
 
-    // TODO - remove
-    debounced = this.debounce(
-        (label) => {
-            console.log(`🔔 Debounced: ${label}`);
-        },
-        1000,
-        'render'
-    );
+    // // TODO - remove
+    // debounced = this.debounce(
+    //     (label) => {
+    //         console.log(`🔔 Debounced: ${label}`);
+    //     },
+    //     1000,
+    //     'render'
+    // );
 
     subscribeToStore = () => {
         store.subscribe(() => {
-            this.debounced('renders caused by store change');
+            // this.debounced('renders caused by store change');
             this.render();
         });
     };
@@ -92,7 +84,7 @@ class MapExplorer {
                 location,
                 latitude: location.buildingLatitude,
                 longitude: location.buildingLongitude,
-                zoomLevel: 10,
+                zoomLevel: 10, // TODO - adjust so that this doesn't change the zoom level unless it's really zoomed out
             })
         );
     }
@@ -102,15 +94,17 @@ class MapExplorer {
         await loader.load();
 
         const data = await this.fetchData();
-        store.dispatch(setLocations(data.locationsArray));
 
-        await this.map.init(
-            {
-                lat: Number(data.latitude),
-                lng: Number(data.longitude),
-            },
-            Number(data.zoomLevel)
+        const { locationsArray, latitude, longitude } = data;
+        store.dispatch(setLocations(locationsArray));
+        store.dispatch(
+            setMapCenter({
+                latitude,
+                longitude,
+            })
         );
+
+        await this.map.init();
 
         this.locationList.init(data.locationsArray, this.handleLocationClick);
     }
@@ -129,9 +123,10 @@ class MapExplorer {
         const selectedLocation = selectSelectedLocation(state);
 
         // console.log(`locationsChanged`, locationsChanged);
-        this.map.updateMap(mapCenter, zoomLevel);
+        // this.map.updateMap(mapCenter, zoomLevel);
 
         if (locationsChanged) {
+            console.log(`🍕: locations have changed`);
             this.map.addMarkers(locations, selectedLocation);
 
             store.dispatch(toggleLocationsChanged());
