@@ -13,7 +13,19 @@ const uiSlice = createSlice({
     },
     reducers: {
         setSelectedLocation: (state, action) => {
-            state.selectedLocation = action.payload;
+            const {
+                locationId,
+                locationName,
+                buildingLatitude,
+                buildingLongitude,
+            } = action.payload;
+
+            state.selectedLocation = {
+                id: locationId,
+                name: locationName,
+                latitude: Number(buildingLatitude),
+                longitude: Number(buildingLongitude),
+            };
         },
     },
     selectors: {

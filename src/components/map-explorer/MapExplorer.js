@@ -22,6 +22,9 @@ const GOOGLE_MAPS_API_OPTIONS = {
     version: 'weekly',
     libraries: ['places', 'geometry', 'marker'],
 };
+
+const MIN_ZOOM_LEVEL_ON_LOCATION_SELECT = 10;
+
 class MapExplorer {
     constructor() {
         this.map = new Map();
@@ -63,33 +66,42 @@ class MapExplorer {
         //     '🚀🚀🚀 ~ file: MapExplorer.js:56 ~ prevState.selectedLocation🚀🚀🚀',
         //     selectSelectedLocation(prevState)
         // );
-        const newSelected = selectSelectedLocation(newState);
-        const prevSelected = selectSelectedLocation(prevState);
+        const selectedLocation = selectSelectedLocation(newState);
+        const prevSelectedLocation = selectSelectedLocation(prevState);
 
-        if (newSelected !== prevSelected) {
+        if (selectedLocation !== prevSelectedLocation) {
             console.log(`🤩: handling state change!`);
             const { map } = this;
-            const { latitude, longitude } = newSelected;
-            const zoomLevel = selectZoomLevel(newState);
+            const { latitude, longitude } = selectedLocation;
+            const currentZoom = selectZoomLevel(newState);
             console.log(
-                '🚀🚀🚀 ~ file: MapExplorer.js:72 ~ zoomLevel🚀🚀🚀',
+                '🚀🚀🚀 ~ file: MapExplorer.js:77 ~ currentZoom🚀🚀🚀',
+                currentZoom
+            );
+            const zoomLevel =
+                currentZoom < MIN_ZOOM_LEVEL_ON_LOCATION_SELECT
+                    ? MIN_ZOOM_LEVEL_ON_LOCATION_SELECT
+                    : currentZoom;
+            console.log(
+                '🚀🚀🚀 ~ file: MapExplorer.js:79 ~ zoomLevel🚀🚀🚀',
                 zoomLevel
             );
 
-            map.update({ lat: latitude, lng: longitude }, 10);
+            map.update({ lat: latitude, lng: longitude }, zoomLevel);
         }
     };
 
     handleLocationClick = (location) => {
         console.log(`🍕: handleLocationClick ${location.locationName}`);
-        store.dispatch(
-            updateLocation({
-                location,
-                latitude: location.buildingLatitude,
-                longitude: location.buildingLongitude,
-                zoomLevel: 10, // Consider making this dynamic based on current zoom
-            })
-        );
+        store.dispatch(setSelectedLocation(location));
+        // store.dispatch(
+        //     updateLocation({
+        //         location,
+        //         latitude: location.buildingLatitude,
+        //         longitude: location.buildingLongitude,
+        //         zoomLevel: 10, // Consider making this dynamic based on current zoom
+        //     })
+        // );
         // store.dispatch(setSelectedLocation(location));
     };
 

@@ -57,15 +57,16 @@ class Map {
         console.log(`this.widget`, this.widget);
         if (this.widget) {
             this.widget.setCenter({ lat, lng });
-            const currentZoom = this.widget.getZoom();
-            console.log(
-                '🚀🚀🚀 ~ file: Map.js:57 ~ update ~ currentZoom🚀🚀🚀',
-                currentZoom
-            );
-            currentZoom < 10 && this.widget.setZoom(zoomLevel);
-            const foo = this.widget.getCenter();
+            this.widget.setZoom(zoomLevel);
+            // const currentZoom = this.widget.getZoom();
+            // console.log(
+            // '🚀🚀🚀 ~ file: Map.js:57 ~ update ~ currentZoom🚀🚀🚀',
+            // currentZoom
+            // );
+            // currentZoom < 10 && this.widget.setZoom(zoomLevel);
+            // const foo = this.widget.getCenter();
 
-            console.log(`this.widget.getCenter()`, foo.lat(), foo.lng());
+            // console.log(`this.widget.getCenter()`, foo.lat(), foo.lng());
             // Optionally, apply mapBounds if needed
         }
     }
