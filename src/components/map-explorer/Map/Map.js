@@ -34,7 +34,12 @@ class Map {
             }
         );
 
-        this.widget.addListener('idle', () => this.onIdle());
+        // prevent idle event from firing before the map is fully loaded
+        google.maps.event.addListenerOnce(this.widget, 'tilesloaded', () => {
+            this.widget.addListener('idle', () => {
+                this.onIdle();
+            });
+        });
     }
 
     onIdle() {
