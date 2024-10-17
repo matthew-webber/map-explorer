@@ -1,7 +1,9 @@
 {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "turboConsoleLog.includeFileNameAndLineNum": true,
-    "turboConsoleLog.insertEmptyLineBeforeLogMessage": true,
-    "turboConsoleLog.insertEmptyLineAfterLogMessage": true,
-    "turboConsoleLog.insertEnclosingClass": false
+    "turboConsoleLog.insertEmptyLineBeforeLogMessage": false,
+    "turboConsoleLog.insertEmptyLineAfterLogMessage": false,
+    "turboConsoleLog.insertEnclosingClass": false,
+    "turboConsoleLog.logMessagePrefix": "🚀🚀🚀",
+    "turboConsoleLog.logMessageSuffix": "🚀🚀🚀"
 }

@@ -4,91 +4,94 @@ import SearchBar from './SearchBar/SearchBar.js';
 import Filter from './Filter/Filter.js';
 import LocationList from './LocationList/LocationList.js';
 import { Loader } from '@googlemaps/js-api-loader';
-import { selectSelectedLocation } from '../../store/uiSelectors.js';
-import { updateLocation } from '../../store/actions.js'; // Import the new action
-
-// import { setMapCenter, setZoomLevel } from '../../store/mapSlice.js';
+import { setLocations, selectLocations } from '../../store/locationsSlice.js';
 import {
-    setLocations,
-    toggleLocationsChanged,
-    selectLocations,
-    selectLocationsChanged,
-} from '../../store/locationsSlice.js';
-import {
+    setMapCenter,
     selectMapCenter,
     selectZoomLevel,
-    setMapCenter,
-    setZoomLevel,
     selectMapBounds,
 } from '../../store/mapSlice.js';
-import { setSelectedLocation } from '../../store/uiSlice.js';
+import {
+    setSelectedLocation,
+    selectSelectedLocation,
+} from '../../store/uiSlice.js';
+import { updateLocation } from '../../store/actions.js';
 
 const GOOGLE_MAPS_API_OPTIONS = {
     apiKey: 'AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM', // Replace with your actual API key
     version: 'weekly',
     libraries: ['places', 'geometry', 'marker'],
 };
-
 class MapExplorer {
     constructor() {
         this.map = new Map();
-        this.searchBar = new SearchBar(this.map);
-        this.filter = new Filter(this.map);
+        this.searchBar = new SearchBar();
+        this.filter = new Filter();
         this.locationList = new LocationList();
+        this.state = store.getState();
     }
-
-    // TODO - remove
-    // debounce(func, wait, label) {
-    //     let timeout;
-    //     let counter = 0;
-
-    //     return function (...args) {
-    //         const context = this;
-    //         const later = function () {
-    //             console.log(`⏱️ Total ${label} in window: ${counter}`);
-    //             timeout = null;
-    //             counter = 0;
-    //         };
-
-    //         if (!timeout) {
-    //             timeout = setTimeout(later, wait);
-    //             counter++;
-    //             return func.apply(context, args);
-    //         } else {
-    //             clearTimeout(timeout);
-    //             counter++;
-    //             timeout = setTimeout(later, wait);
-    //             return counter;
-    //         }
-    //     };
-    // }
-
-    // // TODO - remove
-    // debounced = this.debounce(
-    //     (label) => {
-    //         console.log(`🔔 Debounced: ${label}`);
-    //     },
-    //     1000,
-    //     'render'
-    // );
 
     subscribeToStore = () => {
         store.subscribe(() => {
-            // this.debounced('renders caused by store change');
-            this.render();
+            const newState = store.getState();
+            this.handleStateChange(this.state, newState);
+            this.state = newState;
         });
     };
 
-    handleLocationClick(location) {
+    handleStateChange = (prevState, newState) => {
+        console.log(`🤔: handling state change?`);
+        /*
+        if the selected location changed,
+            update the map pin's classList associated with the selected location to include '.map-pin.selected
+            update the map's...
+                center to have the selected location's latitude and longitude
+                zoom level to 10 (unless the current zoom level is >= 10)
+        if the map bounds changed,
+            tell the location list to update its list of locations
+        if the filter changed,
+            tell the location list to update its list of locations
+        if the search query changed,
+            that means the map bounds changed as well, so tell the location list to update its list of locations
+        */
+
+        // console.log(
+        //     '🚀🚀🚀 ~ file: MapExplorer.js:56 ~ newState.selectedLocation🚀🚀🚀',
+        //     selectSelectedLocation(newState)
+        // );
+        // console.log(
+        //     '🚀🚀🚀 ~ file: MapExplorer.js:56 ~ prevState.selectedLocation🚀🚀🚀',
+        //     selectSelectedLocation(prevState)
+        // );
+        const newSelected = selectSelectedLocation(newState);
+        const prevSelected = selectSelectedLocation(prevState);
+
+        if (newSelected !== prevSelected) {
+            console.log(`🤩: handling state change!`);
+            const { map } = this;
+            const { latitude, longitude } = newSelected;
+            const zoomLevel = selectZoomLevel(newState);
+            console.log(
+                '🚀🚀🚀 ~ file: MapExplorer.js:72 ~ zoomLevel🚀🚀🚀',
+                zoomLevel
+            );
+
+            map.update({ lat: latitude, lng: longitude }, 10);
+        }
+    };
+
+    handleLocationClick = (location) => {
+        console.log(`🍕: handleLocationClick ${location.locationName}`);
         store.dispatch(
             updateLocation({
                 location,
                 latitude: location.buildingLatitude,
                 longitude: location.buildingLongitude,
-                zoomLevel: 10, // TODO - adjust so that this doesn't change the zoom level unless it's really zoomed out
+                zoomLevel: 10, // Consider making this dynamic based on current zoom
             })
         );
-    }
+        // store.dispatch(setSelectedLocation(location));
+    };
 
     async init() {
         const loader = new Loader(GOOGLE_MAPS_API_OPTIONS);
@@ -96,74 +99,27 @@ class MapExplorer {
 
         const data = await this.fetchData();
 
-        const { locationsArray, latitude, longitude } = data;
+        console.log(`🍕: data`, data);
+
+        const { locationsArray, latitude, longitude, zoomLevel } = data;
+
+        const lat = Number(latitude);
+        const lng = Number(longitude);
+        const zoom = Number(zoomLevel);
+
         store.dispatch(setLocations(locationsArray));
-        store.dispatch(
-            setMapCenter({
-                latitude,
-                longitude,
-            })
-        );
+        // store.dispatch(setMapCenter({ lat, lng }));
 
-        await this.map.init();
-        console.log(`Map bounds are`, this.map.widget.getBounds());
+        await this.map.init({ lat, lng }, zoom);
+        this.map.addMarkers(locationsArray);
 
-        // console.log(`Map bounds are`, this.map.widget.getBounds());
-        // console.log(`Map zoom are`, this.map.widget.getZoom());
-        // console.log(`Map center are`, this.map.widget.getCenter());
-        // this.map.widget.addListener('bounds_changed', console.log(`bounds_changed`));
-
-        this.locationList.init(data.locationsArray, this.handleLocationClick);
+        this.locationList.init(locationsArray, this.handleLocationClick);
+        this.subscribeToStore();
     }
 
     async fetchData() {
         const response = await fetch('/api/locations');
         return await response.json();
-    }
-
-    async render() {
-        const state = store.getState();
-        const mapCenter = selectMapCenter(state);
-        const zoomLevel = selectZoomLevel(state);
-        const mapBounds = selectMapBounds(state);
-        const locations = selectLocations(state);
-
-        console.log(
-            '🚀🚀🚀 ----------------------------------------------------------------------🚀🚀🚀'
-        );
-        console.log(
-            '🚀🚀🚀 ~ file: MapExplorer.js:131 ~ render ~ mapCenter, zoomLevel, mapBounds',
-            mapCenter,
-            zoomLevel,
-            mapBounds
-        );
-        console.log(
-            '🚀🚀🚀 ----------------------------------------------------------------------🚀🚀🚀'
-        );
-
-        const locationsChanged = selectLocationsChanged(state);
-        const selectedLocation = selectSelectedLocation(state);
-
-        // console.log(`locationsChanged`, locationsChanged);
-        // this.map.update(mapCenter, zoomLevel);
-
-        if (locationsChanged) {
-            console.log(`🍕: locations have changed`);
-            this.map.addMarkers(locations, selectedLocation);
-
-            store.dispatch(toggleLocationsChanged());
-        }
-
-        // this.addGetMapWidgetBoundsButtonToDom();
-    }
-
-    addGetMapWidgetBoundsButtonToDom() {
-        const button = document.createElement('button');
-        button.innerText = 'Get Map Widget Bounds';
-        button.addEventListener('click', () => {
-            console.log(`Map bounds are`, this.map.widget.getBounds());
-        });
-        document.body.appendChild(button);
     }
 }
 

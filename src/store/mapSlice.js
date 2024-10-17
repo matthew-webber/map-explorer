@@ -9,22 +9,30 @@ import {
 const mapSlice = createSlice({
     name: 'map',
     initialState: {
-        mapCenter: { lat: 32.7833, lng: -79.932 },
-        zoomLevel: 7,
+        mapCenter: { lat: null, lng: null },
+        // mapCenter: { lat: 32.7833, lng: -79.932 },
+        zoomLevel: null,
+        // zoomLevel: 7,
         mapBounds: {
-            // represents the bounds for the above center and zoom level
-            north: 36.749773313125786,
-            east: -77.505279734375,
-            south: 30.81958157411624,
-            west: -84.822174265625,
+            north: null,
+            east: null,
+            south: null,
+            west: null,
         },
+        // mapBounds: {
+        //     // represents the bounds for the above center and zoom level
+        //     north: 36.749773313125786,
+        //     east: -77.505279734375,
+        //     south: 30.81958157411624,
+        //     west: -84.822174265625,
+        // },
     },
     reducers: {
         setMapCenter: (state, action) => {
             console.log('🍕: selectors.setMapCenter');
-            const { latitude, longitude } = action.payload;
-            console.log(`🍕: selectors.setMapCenter ${latitude} ${longitude}`);
-            state.mapCenter = { lat: Number(latitude), lng: Number(longitude) };
+            const { lat, lng } = action.payload;
+            console.log(`🍕: selectors.setMapCenter ${lat} ${lng}`);
+            state.mapCenter = { lat: Number(lat), lng: Number(lng) };
         },
         setZoomLevel: (state, action) => {
             state.zoomLevel = Number(action.payload);

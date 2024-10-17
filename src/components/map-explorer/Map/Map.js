@@ -20,103 +20,54 @@ let mapPin = null;
 class Map {
     constructor() {
         this.markers = [];
-        this.unsubscribe = null;
         this.widget = null;
-        this.current = {
-            center: { lat: null, lng: null },
-            zoom: null,
-        };
     }
 
-    update(center, zoom) {
-        console.log(`Updating map with center: ${center.lat}, ${center.lng}`);
-        if (this.widget) {
-            // this.widget.setZoom(zoom);
-            // this.widget.panTo(center);
-        }
-    }
-
-    async init() {
-        // Subscribe to the Redux store
-        this.unsubscribe = store.subscribe(this.handleStoreChange);
-
-        // Initialize the map with current state
-        const state = store.getState();
-        const center = selectMapCenter(state);
-        const zoom = selectZoomLevel(state);
-        // const bounds = selectMapBounds(state); // Get initial bounds if needed
-
-        console.log(
-            `Initializing map with center: ${center.lat}, ${center.lng} and zoom: ${zoom}`
-        );
+    async init(center, zoom) {
+        // Initialize the Google Map widget
         this.widget = await new google.maps.Map(
             document.querySelector('#map'),
             {
-                center: center,
-                zoom: zoom,
-                minZoom: zoom,
+                center,
+                zoom,
                 mapId: GOOGLE_MAP_ID,
             }
         );
 
-        this.widget.addListener('idle', () => this.updateMapLocation());
-
-        this.widget.addListener('zoom_changed', () =>
-            console.log(`zoom_changed`)
-        );
-
-        await this.loadPinMarkup();
+        this.widget.addListener('idle', () => this.onIdle());
     }
 
-    updateMapLocation() {
-        console.log(`Updating map location`);
-        console.log(
-            '🚀🚀🚀 ----------------------------------------------------------------------------------------🚀🚀🚀'
-        );
-        console.log(
-            '🚀🚀🚀 ~ file: Map.js:69 ~ updateMapLocation ~ updateMapLocation🚀🚀🚀'
-        );
-        console.log(
-            '🚀🚀🚀 ----------------------------------------------------------------------------------------🚀🚀🚀'
-        );
-
-        const zoom = this.widget.getZoom();
+    onIdle() {
         const center = this.widget.getCenter();
+        const zoom = this.widget.getZoom();
         const bounds = this.widget.getBounds();
 
-        store.dispatch(
-            updateLocation({
-                latitude: center.lat(),
-                longitude: center.lng(),
-                zoomLevel: zoom,
-                bounds: bounds.toJSON(),
-            })
-        );
+        store.dispatch(setMapCenter({ lat: center.lat(), lng: center.lng() }));
+        store.dispatch(setZoomLevel(zoom));
+        store.dispatch(setMapBounds(bounds.toJSON()));
+
+        // Dispatch actions only if necessary
+        // To prevent loops, ensure these actions don't trigger `onIdle` again unnecessarily
     }
 
-    handleStoreChange = () => {
-        const state = store.getState();
-        const center = selectMapCenter(state);
-        const zoom = selectZoomLevel(state);
+    update({ lat, lng }, zoomLevel, mapBounds) {
+        console.log(
+            `Updating map to center: ${lat}, ${lng} and zoom: ${zoomLevel}`
+        );
+        console.log(`this.widget`, this.widget);
+        if (this.widget) {
+            this.widget.setCenter({ lat, lng });
+            const currentZoom = this.widget.getZoom();
+            console.log(
+                '🚀🚀🚀 ~ file: Map.js:57 ~ update ~ currentZoom🚀🚀🚀',
+                currentZoom
+            );
+            currentZoom < 10 && this.widget.setZoom(zoomLevel);
+            const foo = this.widget.getCenter();
 
-        if (
-            this.current.center.lat !== center.lat ||
-            this.current.center.lng !== center.lng ||
-            this.current.zoom !== zoom
-        ) {
-            this.current = { center, zoom };
-            this.update(center, zoom);
+            console.log(`this.widget.getCenter()`, foo.lat(), foo.lng());
+            // Optionally, apply mapBounds if needed
         }
-    };
-
-    async loadPinMarkup() {
-        const response = await fetch(pinURL);
-        const pinText = await response.text();
-
-        mapPin = new DOMParser().parseFromString(
-            pinText,
-            'image/svg+xml'
-        ).documentElement;
     }
 
     addMarkers(locations, selectedLocation) {
@@ -130,74 +81,24 @@ class Map {
                 lng: Number(location.buildingLongitude),
             };
 
-            const copyOfMapPin = mapPin.cloneNode(true);
-
-            // NOTE - not currently used -- for possible implementation of "selected/highlighted pins" on initial load
-            if (isSelected) {
-                copyOfMapPin.classList.add('selected');
-            }
-
-            const markerElement = new google.maps.marker.AdvancedMarkerElement({
+            const marker = new google.maps.marker.AdvancedMarkerElement({
                 position,
                 map: this.widget,
                 title: location.locationName,
-                content: copyOfMapPin,
+                // Add additional marker configuration here
             });
 
-            this.markers.push({
-                id: location.locationId,
-                element: markerElement,
-            });
+            if (isSelected) {
+                marker.setIcon('selected-icon-url'); // Customize as needed
+            }
+
+            this.markers.push(marker);
         });
     }
 
     clearMarkers() {
-        this.markers.forEach((marker) => marker.element.setMap(null));
+        this.markers.forEach((marker) => marker.setMap(null));
         this.markers = [];
-    }
-
-    highlightMarker(location) {
-        if (!location) {
-            console.log(`No location to highlight`);
-            return;
-        }
-
-        // TODO - refactor for clustering when implementing
-        this.markers.forEach((marker) => {
-            if (marker.id === location.locationId) {
-                marker.element.content.classList.add('selected');
-                marker.element.zIndex = 100;
-            } else {
-                marker.element.content.classList.remove('selected');
-                marker.element.zIndex = null;
-            }
-        });
-    }
-
-    getAllMapWidgetSpatialData() {
-        return {
-            bounds: this.widget.getBounds(),
-            zoom: this.widget.getZoom(),
-            center: this.widget.getCenter(),
-        };
-    }
-
-    focusOnLocation(location) {
-        if (location) {
-            console.log(`Focusing on location: ${location.locationName}`);
-            const position = {
-                lat: Number(location.buildingLatitude),
-                lng: Number(location.buildingLongitude),
-            };
-            this.widget.setZoom(10);
-            this.widget.panTo(position);
-        }
-    }
-
-    destroy() {
-        if (this.unsubscribe) {
-            this.unsubscribe();
-        }
     }
 }
 

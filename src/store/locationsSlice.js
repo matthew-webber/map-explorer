@@ -3,32 +3,21 @@ import { createSlice, createSelector } from '@reduxjs/toolkit';
 const locationsSlice = createSlice({
     name: 'locations',
     initialState: {
-        locationsList: { current: [], changed: false },
+        locationsList: { current: [] },
     },
     reducers: {
         setLocations: (state, action) => {
             console.log(`🍕: reducers.setLocations`);
-            state.locationsList.previous = state.locationsList.current;
             state.locationsList.current = action.payload;
-            state.locationsList.changed = true;
-        },
-        toggleLocationsChanged: (state) => {
-            state.locationsList.changed = !state.locationsList.changed;
         },
     },
     selectors: {
         selectLocations: (state) => state.locationsList.current,
-        selectPreviousLocations: (state) => state.locationsList.previous,
-        selectLocationsChanged: (state) => state.locationsList.changed,
     },
 });
 
-export const { setLocations, toggleLocationsChanged } = locationsSlice.actions;
-export const {
-    selectLocations,
-    selectPreviousLocations,
-    selectLocationsChanged,
-} = locationsSlice.selectors;
+export const { setLocations } = locationsSlice.actions;
+export const { selectLocations } = locationsSlice.selectors;
 export default locationsSlice.reducer;
 
 /*

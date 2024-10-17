@@ -4,20 +4,39 @@ import { updateLocation } from './actions.js'; // Import the new action
 const uiSlice = createSlice({
     name: 'ui',
     initialState: {
-        selectedLocation: null,
+        selectedLocation: {
+            id: null,
+            name: null,
+            latitude: null,
+            longitude: null,
+        },
     },
     reducers: {
         setSelectedLocation: (state, action) => {
             state.selectedLocation = action.payload;
         },
     },
+    selectors: {
+        selectSelectedLocation: (state) => state.selectedLocation,
+    },
     extraReducers: (builder) => {
         builder.addCase(updateLocation, (state, action) => {
             const { location } = action.payload;
-            state.selectedLocation = location;
+
+            state.selectedLocation = {
+                id: location.locationId,
+                name: location.locationName,
+                latitude: Number(location.buildingLatitude),
+                longitude: Number(location.buildingLongitude),
+            };
+            console.log(
+                '🚀🚀🚀 ~ file: uiSlice.js:22 ~ builder.addCase ~ state.selectedLocation🚀🚀🚀',
+                location
+            );
         });
     },
 });
 
 export const { setSelectedLocation } = uiSlice.actions;
+export const { selectSelectedLocation } = uiSlice.selectors;
 export default uiSlice.reducer;
