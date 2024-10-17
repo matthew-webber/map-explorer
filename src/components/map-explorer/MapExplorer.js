@@ -85,6 +85,7 @@ class MapExplorer {
                 '🚀🚀🚀 ~ file: MapExplorer.js:77 ~ currentZoom🚀🚀🚀',
                 currentZoom
             );
+            // TODO - better way to handle this?
             const zoomLevel =
                 currentZoom < MIN_ZOOM_LEVEL_ON_LOCATION_SELECT
                     ? MIN_ZOOM_LEVEL_ON_LOCATION_SELECT
