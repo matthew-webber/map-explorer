@@ -50,6 +50,7 @@ class Map {
         // To prevent loops, ensure these actions don't trigger `onIdle` again unnecessarily
     }
 
+    // TODO - rename -- updateMap? updateMapCenter? updateMapBounds? idk
     update({ lat, lng }, zoomLevel, mapBounds) {
         console.log(
             `Updating map to center: ${lat}, ${lng} and zoom: ${zoomLevel}`
@@ -89,17 +90,31 @@ class Map {
                 // Add additional marker configuration here
             });
 
-            if (isSelected) {
-                marker.setIcon('selected-icon-url'); // Customize as needed
-            }
-
-            this.markers.push(marker);
+            this.markers.push({
+                id: location.locationId,
+                element: marker,
+            });
         });
     }
 
     clearMarkers() {
         this.markers.forEach((marker) => marker.setMap(null));
         this.markers = [];
+    }
+
+    highlightMarker(location) {
+        console.log(`Highlighting marker for location: ${location.name}`);
+        this.markers.forEach((marker) => {
+            console.log(`Checking marker: ${marker.id}`);
+            console.log(`Location ID: ${location.id}`);
+            if (marker.id === location.id) {
+                marker.element.content.classList.add('map-pin-selected');
+                marker.element.zIndex = 100;
+            } else {
+                marker.element.content.classList.remove('map-pin-selected');
+                marker.element.zIndex = null;
+            }
+        });
     }
 }
 

@@ -88,6 +88,7 @@ class MapExplorer {
             );
 
             map.update({ lat: latitude, lng: longitude }, zoomLevel);
+            map.highlightMarker(selectedLocation);
         }
     };
 

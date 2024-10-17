@@ -21,7 +21,7 @@
     transition: all 0.2s ease-in-out;
 }
 
-.map-pin.selected {
+.map-pin-selected {
     /* make slightly larger and make lighter */
     transform: scale(1.4);
     fill: rgb(0, 140, 255);
