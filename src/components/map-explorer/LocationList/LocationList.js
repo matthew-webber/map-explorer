@@ -58,14 +58,13 @@ class LocationList {
     }
 
     renderList(locations) {
-        console.log(`🍕: renderList`, locations);
         this.listContainer.innerHTML = ''; // Clear existing entries
 
         locations.forEach((location) => {
             const listItem = document.createElement('div');
             listItem.setAttribute('data-id', location.locationId); // for scrolling on click
 
-            listItem.classList.add('location-item');
+            listItem.classList.add('location-item'); // TODO - does this class do anything?
             listItem.textContent = location.locationName;
 
             this.listContainer.appendChild(listItem);
@@ -78,8 +77,8 @@ class LocationList {
             });
         });
 
+        // TODO - don't love it
         if (this.selectedId && this.selectedInBounds()) {
-            console.log(`asdf selectedInBounds`);
             this.scrollSelectedToTop(this.selectedId);
         }
     }
