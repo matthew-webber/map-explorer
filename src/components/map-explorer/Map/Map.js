@@ -60,10 +60,9 @@ class Map {
         console.log(
             `Updating map to center: ${lat}, ${lng} and zoom: ${zoomLevel}`
         );
-        console.log(`this.widget`, this.widget);
         if (this.widget) {
-            this.widget.setCenter({ lat, lng });
-            this.widget.setZoom(zoomLevel);
+            this.widget.setZoom(zoomLevel); // setZoom before panTo, otherwise panTo isn't smooth
+            this.widget.panTo({ lat, lng });
             // const currentZoom = this.widget.getZoom();
             // console.log(
             // '🚀🚀🚀 ~ file: Map.js:57 ~ update ~ currentZoom🚀🚀🚀',
@@ -110,8 +109,6 @@ class Map {
     highlightMarker(location) {
         console.log(`Highlighting marker for location: ${location.name}`);
         this.markers.forEach((marker) => {
-            console.log(`Checking marker: ${marker.id}`);
-            console.log(`Location ID: ${location.id}`);
             if (marker.id === location.id) {
                 marker.element.content.classList.add('map-pin-selected');
                 marker.element.zIndex = 100;

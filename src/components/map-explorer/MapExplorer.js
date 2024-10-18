@@ -20,6 +20,7 @@ import {
     selectSelectedLocation,
 } from '../../store/uiSlice.js';
 import { updateLocation } from '../../store/actions.js';
+import { selectSearchedLocation } from '../../store/searchSlice.js';
 
 const GOOGLE_MAPS_API_OPTIONS = {
     apiKey: 'AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM', // Replace with your actual API key
@@ -76,27 +77,16 @@ class MapExplorer {
         const selectedLocation = selectSelectedLocation(newState);
         const prevSelectedLocation = selectSelectedLocation(prevState);
 
-        if (selectedLocation !== prevSelectedLocation) {
-            console.log(`🤩: handling state change!`);
-            const { map } = this;
-            const { latitude, longitude } = selectedLocation;
+        if (selectedLocation && selectedLocation !== prevSelectedLocation) {
+            const { lat, lng } = selectedLocation;
             const currentZoom = selectZoomLevel(newState);
-            console.log(
-                '🚀🚀🚀 ~ file: MapExplorer.js:77 ~ currentZoom🚀🚀🚀',
-                currentZoom
-            );
-            // TODO - better way to handle this?
             const zoomLevel =
                 currentZoom < MIN_ZOOM_LEVEL_ON_LOCATION_SELECT
                     ? MIN_ZOOM_LEVEL_ON_LOCATION_SELECT
                     : currentZoom;
-            console.log(
-                '🚀🚀🚀 ~ file: MapExplorer.js:79 ~ zoomLevel🚀🚀🚀',
-                zoomLevel
-            );
 
-            map.update({ lat: latitude, lng: longitude }, zoomLevel);
-            map.highlightMarker(selectedLocation);
+            this.map.update({ lat, lng }, zoomLevel);
+            this.map.highlightMarker(selectedLocation);
         }
 
         const mapBounds = selectMapBounds(newState);
@@ -106,6 +96,16 @@ class MapExplorer {
 
         if (mapBounds !== prevMapBounds && hideOutOfBounds) {
             console.log(`🤩: handling state change!`);
+            this.locationList.updateLocations('bounds', {
+                data: { bounds: mapBounds },
+            });
+        }
+
+        const searchLocation = selectSearchedLocation(newState);
+        const prevSearchLocation = selectSearchedLocation(prevState);
+
+        if (searchLocation !== prevSearchLocation) {
+            console.log(`🤩: searchLocation different than previous!`);
             this.locationList.updateLocations('bounds', {
                 data: { bounds: mapBounds },
             });
@@ -153,6 +153,13 @@ class MapExplorer {
 
         this.state = store.getState();
         this.subscribeToStore();
+
+        const input = document.getElementById('search-input');
+        const options = {
+            types: ['(cities)'],
+            componentRestrictions: { country: 'us' },
+        };
+        this.searchBar.setupAutocomplete(input, options);
     }
 
     async fetchData() {

@@ -7,8 +7,8 @@ const uiSlice = createSlice({
         selectedLocation: {
             id: null,
             name: null,
-            latitude: null,
-            longitude: null,
+            lat: null,
+            lng: null,
         },
     },
     reducers: {
@@ -23,8 +23,8 @@ const uiSlice = createSlice({
             state.selectedLocation = {
                 id: locationId,
                 name: locationName,
-                latitude: Number(buildingLatitude),
-                longitude: Number(buildingLongitude),
+                lat: Number(buildingLatitude),
+                lng: Number(buildingLongitude),
             };
         },
     },

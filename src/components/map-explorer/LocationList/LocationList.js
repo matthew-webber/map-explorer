@@ -48,7 +48,7 @@ class LocationList {
 
     scrollSelectedToTop(id) {
         const listItem = document.querySelector(`[data-id="${id}"]`);
-        listItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        listItem.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
 
     selectedInBounds() {
