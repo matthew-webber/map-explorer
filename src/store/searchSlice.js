@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+// "close enough" mapping of radius to zoom level
 const radiusToZoomLevel = {
     10: 11.25,
     25: 10,
@@ -14,30 +15,31 @@ const searchSlice = createSlice({
             lat: null,
             lng: null,
         },
-        radius: 0,
+        radius: {
+            value: 0, // in miles, not used currently
+            zoomLevel: 0, // Google Maps zoom level
+        },
+        searchInProgress: false, // for allowing repeated searches
     },
     reducers: {
-        setSearch(state, action) {
+        startSearch(state, action) {
             const { query, lat, lng, radius } = action.payload;
             state.query = query;
             state.result = { lat, lng };
-            state.radius = Number(radius);
+            state.radius = {
+                value: Number(radius),
+                zoomLevel: radiusToZoomLevel[Number(radius)],
+            };
+            state.searchInProgress = true;
         },
-        setSearchResult(state, action) {
-            const { lat, lng } = action.payload;
-            state.searchResult = { lat, lng };
-        },
-        setSearchRadius(state, action) {
-            state.searchRadius = Number(action.payload);
+        endSearch(state) {
+            state.searchInProgress = false;
         },
     },
 });
 
-export const { setSearch } = searchSlice.actions;
+export const { startSearch, endSearch } = searchSlice.actions;
 
-export const selectSearchQuery = (state) => state.search.query;
-export const selectSearchResult = (state) => state.search.result;
-export const selectSearchRadius = (state) =>
-    radiusToZoomLevel[state.search.radius];
+export const selectSearched = (state) => state.search;
 
 export default searchSlice.reducer;
