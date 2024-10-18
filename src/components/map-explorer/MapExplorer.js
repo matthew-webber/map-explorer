@@ -13,6 +13,7 @@ import {
     setMapCenter,
     selectMapCenter,
     selectZoomLevel,
+    setZoomLevel,
     selectMapBounds,
 } from '../../store/mapSlice.js';
 import {
@@ -21,10 +22,10 @@ import {
 } from '../../store/uiSlice.js';
 import { updateLocation } from '../../store/actions.js';
 import {
+    setSearch,
     selectSearchQuery,
-    setSearchQuery,
     selectSearchResult,
-    setSearchResult,
+    selectSearchRadius,
 } from '../../store/searchSlice.js';
 
 const GOOGLE_MAPS_API_OPTIONS = {
@@ -74,7 +75,6 @@ class MapExplorer {
         // store.dispatch(setSelectedLocation(location));
     };
 
-    // TODO - finish!
     handleSearch = (search) => {
         const prevQuery = selectSearchQuery(store.getState());
 
@@ -88,9 +88,14 @@ class MapExplorer {
         if (search.query !== prevQuery) {
             const { query, result, radius } = search;
 
-            store.dispatch(setSearchResult(result));
-            store.dispatch(setSearchQuery(query));
-            
+            const lat = result.geometry.location.lat();
+            const lng = result.geometry.location.lng();
+
+            console.log(
+                `🍕🍕🍕🍕🍕🍕🍕🍕: handleSearch ${query} ${lat} ${lng} ${radius} 🍕🍕🍕🍕🍕🍕🍕🍕`
+            );
+
+            store.dispatch(setSearch({ query, lat, lng, radius }));
         }
     };
 
@@ -135,10 +140,11 @@ class MapExplorer {
         const mapBounds = selectMapBounds(newState);
         const prevMapBounds = selectMapBounds(prevState);
         const hideOutOfBounds = selectHideOutOfBoundsLocations(newState);
-        console.log(`mapBounds !== prevMapBounds`, mapBounds !== prevMapBounds);
 
         if (mapBounds !== prevMapBounds && hideOutOfBounds) {
-            console.log(`🤩: handling state change!`);
+            console.log(
+                `🤩: handling state change! :: mapBounds !== prevMapBounds && hideOutOfBounds`
+            );
             this.locationList.updateLocations('bounds', {
                 data: { bounds: mapBounds },
             });
@@ -147,11 +153,28 @@ class MapExplorer {
         const searchLocation = selectSearchQuery(newState);
         const prevSearchLocation = selectSearchQuery(prevState);
 
+        console.log(`searchLocation`, searchLocation);
+        console.log(`prevSearchLocation`, prevSearchLocation);
+
         if (searchLocation !== prevSearchLocation) {
-            console.log(`🤩: searchLocation different than previous!`);
+            console.log(
+                `🤩: handling state change! :: searchLocation !== prevSearchLocation`
+            );
+
+            const searchResult = selectSearchResult(newState);
+            const searchRadius = selectSearchRadius(newState);
+
             this.locationList.updateLocations('bounds', {
                 data: { bounds: mapBounds },
             });
+
+            this.map.update(
+                {
+                    lat: searchResult.lat,
+                    lng: searchResult.lng,
+                },
+                searchRadius
+            );
         }
     };
 
@@ -192,6 +215,8 @@ class MapExplorer {
             this.handleSearch,
             this.handleSearchError
         );
+
+        this.addSetZoomLevelButtonToDom();
     }
 
     async fetchData() {
@@ -221,6 +246,16 @@ class MapExplorer {
         const zoom = Number(zoomLevel);
 
         return { locations, lat, lng, zoom, hideFilterBar, componentId };
+    }
+
+    addSetZoomLevelButtonToDom() {
+        const button = document.createElement('button');
+        button.innerText = 'Set Zoom Level';
+        button.addEventListener('click', () => {
+            const zoomLevel = prompt('Enter a zoom level');
+            store.dispatch(setZoomLevel(zoomLevel));
+        });
+        document.body.appendChild(button);
     }
 }
 
