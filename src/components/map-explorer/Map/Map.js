@@ -12,9 +12,11 @@ import pinURL from './pin.svg';
 let mapPin = null;
 
 class Map {
-    constructor() {
+    constructor(onPinClick) {
+        // Accept the onPinClick callback
         this.markers = [];
         this.widget = null;
+        this.onPinClick = onPinClick; // Store the callback for later use
     }
 
     async init(center, zoom) {
@@ -71,6 +73,10 @@ class Map {
                 position,
                 map: this.widget,
                 title: location.locationName,
+            });
+
+            marker.addListener('click', () => {
+                this.onPinClick(location);
             });
 
             this.markers.push({

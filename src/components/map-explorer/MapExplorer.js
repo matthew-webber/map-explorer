@@ -28,7 +28,7 @@ import {
 } from '../../store/searchSlice.js';
 
 const GOOGLE_MAPS_API_OPTIONS = {
-    apiKey: 'AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM', // Replace with your actual API key
+    apiKey: 'AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM',
     version: 'weekly',
     libraries: ['places', 'geometry', 'marker'],
 };
@@ -37,7 +37,7 @@ const MIN_ZOOM_LEVEL_ON_LOCATION_SELECT = 10;
 
 class MapExplorer {
     constructor() {
-        this.map = new Map();
+        this.map = new Map(this.handleLocationClick);
         this.searchBar = new SearchBar();
         this.filter = new Filter();
         this.locationList = new LocationList(this.handleLocationClick);
@@ -192,8 +192,6 @@ class MapExplorer {
             this.handleSearch,
             this.handleSearchError
         );
-
-        this.addSetZoomLevelButtonToDom();
     }
 
     async fetchData() {
