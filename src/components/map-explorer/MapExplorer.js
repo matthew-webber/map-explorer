@@ -20,7 +20,12 @@ import {
     selectSelectedLocation,
 } from '../../store/uiSlice.js';
 import { updateLocation } from '../../store/actions.js';
-import { selectSearchedLocation } from '../../store/searchSlice.js';
+import {
+    selectSearchQuery,
+    setSearchQuery,
+    selectSearchResult,
+    setSearchResult,
+} from '../../store/searchSlice.js';
 
 const GOOGLE_MAPS_API_OPTIONS = {
     apiKey: 'AIzaSyD8Q7m2tEwXjBmPEZsxEPEdbcHrxd1brYM', // Replace with your actual API key
@@ -53,6 +58,44 @@ class MapExplorer {
             this.handleStateChange(this.state, newState);
             this.state = newState;
         });
+    };
+
+    handleLocationClick = (location) => {
+        console.log(`🍕: handleLocationClick ${location.locationName}`);
+        store.dispatch(setSelectedLocation(location));
+        // store.dispatch(
+        //     updateLocation({
+        //         location,
+        //         latitude: location.buildingLatitude,
+        //         longitude: location.buildingLongitude,
+        //         zoomLevel: 10, // Consider making this dynamic based on current zoom
+        //     })
+        // );
+        // store.dispatch(setSelectedLocation(location));
+    };
+
+    // TODO - finish!
+    handleSearch = (search) => {
+        const prevQuery = selectSearchQuery(store.getState());
+
+        console.log(
+            '🚀🚀🚀 ~ file: MapExplorer.js:84 ~ prevQuery=',
+            prevQuery,
+            ' // query=',
+            search.query,
+            '🚀🚀🚀'
+        );
+        if (search.query !== prevQuery) {
+            const { query, result, radius } = search;
+
+            store.dispatch(setSearchResult(result));
+            store.dispatch(setSearchQuery(query));
+            
+        }
+    };
+
+    handleSearchError = () => {
+        this.searchBar.toggleValidationMessage('Please enter a location');
     };
 
     handleStateChange = (prevState, newState) => {
@@ -101,8 +144,8 @@ class MapExplorer {
             });
         }
 
-        const searchLocation = selectSearchedLocation(newState);
-        const prevSearchLocation = selectSearchedLocation(prevState);
+        const searchLocation = selectSearchQuery(newState);
+        const prevSearchLocation = selectSearchQuery(prevState);
 
         if (searchLocation !== prevSearchLocation) {
             console.log(`🤩: searchLocation different than previous!`);
@@ -110,20 +153,6 @@ class MapExplorer {
                 data: { bounds: mapBounds },
             });
         }
-    };
-
-    handleLocationClick = (location) => {
-        console.log(`🍕: handleLocationClick ${location.locationName}`);
-        store.dispatch(setSelectedLocation(location));
-        // store.dispatch(
-        //     updateLocation({
-        //         location,
-        //         latitude: location.buildingLatitude,
-        //         longitude: location.buildingLongitude,
-        //         zoomLevel: 10, // Consider making this dynamic based on current zoom
-        //     })
-        // );
-        // store.dispatch(setSelectedLocation(location));
     };
 
     async init() {
@@ -149,17 +178,20 @@ class MapExplorer {
         this.map.addMarkers(locationsArray);
 
         this.locationList.init(locationsArray, this.handleLocationClick);
-        this.locationList.renderList(locationsArray);
 
         this.state = store.getState();
         this.subscribeToStore();
 
-        const input = document.getElementById('search-input');
-        const options = {
+        const autocompleteOptions = {
             types: ['(cities)'],
             componentRestrictions: { country: 'us' },
+            fields: ['geometry'],
         };
-        this.searchBar.setupAutocomplete(input, options);
+        this.searchBar.init(
+            autocompleteOptions,
+            this.handleSearch,
+            this.handleSearchError
+        );
     }
 
     async fetchData() {

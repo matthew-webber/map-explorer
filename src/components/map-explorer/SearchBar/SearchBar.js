@@ -1,60 +1,84 @@
-// @ts-check
-
 // import { store } from '../../../store/store'; // Import the store
 // import { setMapCenter } from '../../../store/mapSlice.js';
 // import { selectMapCenter } from '../../../store/mapSelectors.js';
 
-import { store } from '../../../store/store'; // Import the store
-import { setMapCenter } from '../../../store/mapSlice.js';
-import { setSearchedLocation } from '../../../store/searchSlice.js';
-
-let foo = true;
-
-foo = 42;
-
-console.log(`foo: ${foo}`);
-
 class SearchBar {
     constructor() {
+        this.input = document.querySelector('#search-input');
+        this.searchRadius = document.querySelector('#search-radius');
+        this.searchButton = document.querySelector('#search-btn');
+        this.validationMessage = document.querySelector('.validation-message');
+
+        this.onSearch = () => {};
+        this.onError = () => {};
+
+        this.autocomplete = {
+            widget: null,
+            place: null,
+            queryString: '',
+        };
+    }
+
+    init(autocompleteOptions, onSearch, onError) {
+        this.onSearch = onSearch;
+        this.onError = onError;
+        this.setupAutocomplete(autocompleteOptions);
         this.setupEventListeners();
     }
 
-    setupAutocomplete() {
-        const input = document.querySelector('#search-input');
-        const zoomLevel = document.querySelector('#zoom-level').value;
+    setupAutocomplete(options) {
+        this.autocomplete.widget = new google.maps.places.Autocomplete(
+            this.input,
+            options
+        );
 
-        const options = {
-            types: ['(cities)'],
-            componentRestrictions: { country: 'us' },
-        };
-        this.autocomplete = new google.maps.places.Autocomplete(input, options);
-        this.autocomplete.addListener('place_changed', () => {
-            const place = this.autocomplete.getPlace();
-            if (place.geometry) {
-                const { lat, lng } = place.geometry.location;
-                // Dispatch action to update search state in the Redux store
-                store.dispatch(
-                    setSearchedLocation({
-                        lat: lat(),
-                        lng: lng(),
-                        zoom: zoomLevel,
-                    })
-                );
-            } else {
-                alert("No details available for input: '" + place.name + "'");
-            }
+        // Since this only fires when the user selects a place from the dropdown,
+        // we can be sure that the input value is invalid if the place is not set
+        // or if the input value has changed since the place was selected.
+        this.autocomplete.widget.addListener('place_changed', () => {
+            this.autocomplete.place = this.autocomplete.widget.getPlace(); // the selected place
+            this.autocomplete.queryString = this.input.value; // the string in the input when the place was selected
+        });
+    }
+
+    /**
+     * Verifies that the search is valid before calling the search handler
+     * otherwise it calls the error handler
+     */
+
+    verifyAndSearch() {
+        if (
+            !this.autocomplete.place || // no place selected
+            this.autocomplete.queryString !== this.input.value // input value has changed since selection
+        ) {
+            this.onError();
+            return;
+        }
+
+        this.onSearch({
+            result: this.autocomplete.place,
+            query: this.input.value,
+            radius: this.searchRadius.value,
         });
     }
 
     setupEventListeners() {
-        document.getElementById('search-btn').addEventListener('click', () => {
-            const input = document.querySelector('#search-input').value;
-            console.log(
-                `this.autocomplete.getPlace() ${
-                    this.autocomplete.getPlace().geometry.location
-                }`
-            );
+        this.searchButton.addEventListener('click', () => {
+            this.verifyAndSearch();
         });
+        this.input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                this.verifyAndSearch();
+            }
+        });
+    }
+
+    toggleValidationMessage(message) {
+        // show the error
+
+        setTimeout(() => {
+            // hide the error after 5 seconds
+        }, 5000);
     }
 }
 

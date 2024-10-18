@@ -9,6 +9,7 @@ class LocationList {
     init(locations, onLocationClick) {
         this.locations = locations;
         this.onLocationClick = onLocationClick;
+        this.renderList(locations);
     }
 
     getLocationsInBounds(bounds) {
@@ -58,6 +59,9 @@ class LocationList {
     }
 
     renderList(locations) {
+        console.log(
+            '🚀🚀🚀 ~ file: LocationList.js:62 ~ renderList ~ renderList🚀🚀🚀'
+        );
         this.listContainer.innerHTML = ''; // Clear existing entries
 
         locations.forEach((location) => {

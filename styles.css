@@ -27,3 +27,12 @@
     fill: rgb(0, 140, 255);
     stroke: rgb(0, 69, 125);
 }
+
+.error-message {
+    color: red;
+    font-size: 1.2em;
+}
+
+.hidden {
+    display: none !important;
+}
