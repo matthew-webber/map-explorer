@@ -1,19 +1,13 @@
 import { store } from '../../../store/store';
 import {
-    selectMapCenter,
-    selectZoomLevel,
-    selectMapBounds,
     setMapCenter,
     setZoomLevel,
     setMapBounds,
 } from '../../../store/mapSlice.js'; // Import selectors
-// import { selectLocations } from '../../../store/locationsSelectors.js';
-import { debounce } from '../../../utils/debounce.js';
 
 const GOOGLE_MAP_ID = '9b8ee480625b2419'; // Replace with your actual Map ID
 
 import pinURL from './pin.svg';
-import { updateLocation } from '../../../store/actions';
 
 let mapPin = null;
 
@@ -24,7 +18,6 @@ class Map {
     }
 
     async init(center, zoom) {
-        // Initialize the Google Map widget
         this.widget = await new google.maps.Map(
             document.querySelector('#map'),
             {
@@ -50,9 +43,6 @@ class Map {
         store.dispatch(setMapCenter({ lat: center.lat(), lng: center.lng() }));
         store.dispatch(setZoomLevel(zoom));
         store.dispatch(setMapBounds(bounds.toJSON()));
-
-        // Dispatch actions only if necessary
-        // To prevent loops, ensure these actions don't trigger `onIdle` again unnecessarily
     }
 
     // TODO - rename -- updateMap? updateMapCenter? updateMapBounds? idk
@@ -63,16 +53,6 @@ class Map {
         if (this.widget) {
             this.widget.setZoom(zoomLevel); // setZoom before panTo, otherwise panTo isn't smooth
             this.widget.panTo({ lat, lng });
-            // const currentZoom = this.widget.getZoom();
-            // console.log(
-            // '🚀🚀🚀 ~ file: Map.js:57 ~ update ~ currentZoom🚀🚀🚀',
-            // currentZoom
-            // );
-            // currentZoom < 10 && this.widget.setZoom(zoomLevel);
-            // const foo = this.widget.getCenter();
-
-            // console.log(`this.widget.getCenter()`, foo.lat(), foo.lng());
-            // Optionally, apply mapBounds if needed
         }
     }
 
@@ -91,7 +71,6 @@ class Map {
                 position,
                 map: this.widget,
                 title: location.locationName,
-                // Add additional marker configuration here
             });
 
             this.markers.push({

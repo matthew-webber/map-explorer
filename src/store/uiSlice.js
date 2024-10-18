@@ -41,10 +41,6 @@ const uiSlice = createSlice({
                 latitude: Number(location.buildingLatitude),
                 longitude: Number(location.buildingLongitude),
             };
-            console.log(
-                '🚀🚀🚀 ~ file: uiSlice.js:22 ~ builder.addCase ~ state.selectedLocation🚀🚀🚀',
-                location
-            );
         });
     },
 });

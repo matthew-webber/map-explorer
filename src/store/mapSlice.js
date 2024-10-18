@@ -10,22 +10,13 @@ const mapSlice = createSlice({
     name: 'map',
     initialState: {
         mapCenter: { lat: null, lng: null },
-        // mapCenter: { lat: 32.7833, lng: -79.932 },
         zoomLevel: null,
-        // zoomLevel: 7,
         mapBounds: {
             north: null,
             east: null,
             south: null,
             west: null,
         },
-        // mapBounds: {
-        //     // represents the bounds for the above center and zoom level
-        //     north: 36.749773313125786,
-        //     east: -77.505279734375,
-        //     south: 30.81958157411624,
-        //     west: -84.822174265625,
-        // },
     },
     reducers: {
         setMapCenter: (state, action) => {
