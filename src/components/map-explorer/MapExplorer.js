@@ -225,3 +225,11 @@ class MapExplorer {
 }
 
 export default MapExplorer;
+
+/*
+// TODO
+- [] test if adding return statements after each conditional in handleStateChange breaks the app
+- [] add restrictions to the map bounds for autocomplete search
+
+
+*/
