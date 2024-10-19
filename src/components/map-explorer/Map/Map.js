@@ -56,7 +56,7 @@ class Map {
     }
 
     addMarkers(locations, selectedLocation) {
-        this.clearMarkers();
+        // this.clearMarkers(); // TODO - ok to remove?
         locations.forEach((location) => {
             const isSelected =
                 selectedLocation &&
@@ -84,7 +84,9 @@ class Map {
     }
 
     clearMarkers() {
-        this.markers.forEach((marker) => marker.setMap(null));
+        this.markers.forEach((marker) => {
+            marker.element.map = null;
+        });
         this.markers = [];
     }
 
@@ -98,6 +100,16 @@ class Map {
                 marker.element.zIndex = null;
             }
         });
+    }
+
+    updateMarkers(locations) {
+        console.log(`Updating markers with ${locations.length} locations`);
+        console.log(`this.markers was ${this.markers.length}`);
+
+        this.clearMarkers();
+        console.log(`this.markers is now ${this.markers.length}`);
+        this.addMarkers(locations);
+        console.log(`this.markers is now ${this.markers.length}`);
     }
 }
 

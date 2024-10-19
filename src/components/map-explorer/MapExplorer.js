@@ -19,6 +19,8 @@ import {
 import {
     setSelectedLocation,
     selectSelectedLocation,
+    selectFilterCategories,
+    setFilterCategories,
 } from '../../store/uiSlice.js';
 import { updateLocation } from '../../store/actions.js';
 import {
@@ -71,12 +73,15 @@ class MapExplorer {
         const lat = result.geometry.location.lat();
         const lng = result.geometry.location.lng();
 
-
         store.dispatch(startSearch({ query, lat, lng, radius }));
     };
 
     handleSearchError = () => {
         this.searchBar.toggleValidationMessage('Please enter a location');
+    };
+
+    handleFilterChange = (filters) => {
+        store.dispatch(setFilterCategories(filters));
     };
 
     handleStateChange = (prevState, newState) => {
@@ -132,7 +137,22 @@ class MapExplorer {
 
             store.dispatch(endSearch(newState));
         }
+
+        const prevFilters = selectFilterCategories(prevState);
+        const currentFilters = selectFilterCategories(newState);
+
+        if (prevFilters !== currentFilters) {
+            this.applyFilters(currentFilters);
+        }
     };
+
+    applyFilters(filters) {
+        const filteredLocations = this.locationList.updateLocations('filter', {
+            data: { categories: filters },
+        });
+        console.log(`filteredLocations is`, filteredLocations);
+        this.map.updateMarkers(filteredLocations);
+    }
 
     async init() {
         const loader = new Loader(GOOGLE_MAPS_API_OPTIONS);
@@ -171,6 +191,9 @@ class MapExplorer {
             this.handleSearch,
             this.handleSearchError
         );
+
+        const categories = this.extractCategories(data.locationsArray);
+        this.filter.init(categories, this.handleFilterChange);
     }
 
     async fetchData() {
@@ -200,6 +223,16 @@ class MapExplorer {
         const zoom = Number(zoomLevel);
 
         return { locations, lat, lng, zoom, hideFilterBar, componentId };
+    }
+
+    extractCategories(locations) {
+        const categorySet = new Set();
+        locations.forEach((location) => {
+            location.categoriesArray.forEach((category) => {
+                categorySet.add(category.categoryName);
+            });
+        });
+        return Array.from(categorySet);
     }
 }
 

@@ -25,24 +25,52 @@ class LocationList {
         });
     }
 
+    getLocationsMatchingCategories(filters) {
+        if (filters.length === 0) {
+            return this.locations;
+        }
+        const locationsMatchingCategories = this.locations.filter(
+            (location) => {
+                // console.log(`location is`, { ...location });
+                return location.categoriesArray.some((category) =>
+                    filters.includes(category.categoryName)
+                );
+            }
+        );
+        console.log(
+            `Locations matching categories: ${locationsMatchingCategories.length}`
+        );
+        return locationsMatchingCategories;
+    }
+
     updateLocations(type, { data }) {
         switch (type) {
             case 'bounds': {
                 const { bounds } = data;
                 const locationsInBounds = this.getLocationsInBounds(bounds);
 
-                // don't render if there are no markers in bounds
+                // don't re-render if there are no markers in bounds
                 if (locationsInBounds.length === 0) {
                     return;
                 }
 
-                this.locationsInBounds = locationsInBounds;
-                this.renderList(locationsInBounds);
+                this.locationsInBounds = locationsInBounds; // TODO - return this
+                this.renderList(locationsInBounds); // TODO - call this in handleStateChange parent and rename this from updateLocations()
                 break;
             }
-            case 'filter':
-                // Get locations based on filter
+            case 'filter': {
+                const { categories } = data;
+                console.log(`Filtering by categories: ${categories}`);
+                console.log(`data is`, { ...data });
+
+                this.locationsMatchingCategories =
+                    this.getLocationsMatchingCategories(categories);
+
+                this.renderList(this.locationsMatchingCategories); // TODO - call this in handleStateChange parent and rename this from updateLocations()
+                return this.locationsMatchingCategories;
+
                 break;
+            }
             default:
                 break;
         }

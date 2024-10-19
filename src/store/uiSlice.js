@@ -10,6 +10,7 @@ const uiSlice = createSlice({
             lat: null,
             lng: null,
         },
+        filterCategories: [],
     },
     reducers: {
         setSelectedLocation: (state, action) => {
@@ -27,9 +28,13 @@ const uiSlice = createSlice({
                 lng: Number(buildingLongitude),
             };
         },
+        setFilterCategories: (state, action) => {
+            state.filterCategories = action.payload;
+        },
     },
     selectors: {
         selectSelectedLocation: (state) => state.selectedLocation,
+        selectFilterCategories: (state) => state.filterCategories,
     },
     extraReducers: (builder) => {
         builder.addCase(updateLocation, (state, action) => {
@@ -45,6 +50,7 @@ const uiSlice = createSlice({
     },
 });
 
-export const { setSelectedLocation } = uiSlice.actions;
-export const { selectSelectedLocation } = uiSlice.selectors;
+export const { setSelectedLocation, setFilterCategories } = uiSlice.actions;
+export const { selectSelectedLocation, selectFilterCategories } =
+    uiSlice.selectors;
 export default uiSlice.reducer;
