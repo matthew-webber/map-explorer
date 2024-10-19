@@ -47,21 +47,12 @@ class MapExplorer {
     subscribeToStore = () => {
         store.subscribe(() => {
             const newState = store.getState();
-            console.log(
-                '🚀🚀🚀 ~ file: MapExplorer.js:47 ~ store.subscribe ~ this.state🚀🚀🚀',
-                this.state
-            );
-            console.log(
-                '🚀🚀🚀 ~ file: MapExplorer.js:51 ~ store.subscribe ~ newState🚀🚀🚀',
-                newState
-            );
             this.handleStateChange(this.state, newState);
             this.state = newState;
         });
     };
 
     handleLocationClick = (location) => {
-        console.log(`🍕: handleLocationClick ${location.locationName}`);
         store.dispatch(setSelectedLocation(location));
         // store.dispatch(
         //     updateLocation({
@@ -80,9 +71,6 @@ class MapExplorer {
         const lat = result.geometry.location.lat();
         const lng = result.geometry.location.lng();
 
-        console.log(
-            `🍕🍕🍕🍕🍕🍕🍕🍕: handleSearch ${query} ${lat} ${lng} ${radius} 🍕🍕🍕🍕🍕🍕🍕🍕`
-        );
 
         store.dispatch(startSearch({ query, lat, lng, radius }));
     };
@@ -92,7 +80,6 @@ class MapExplorer {
     };
 
     handleStateChange = (prevState, newState) => {
-        console.log(`🤔: handling state change?`);
         /*
         if the map bounds changed,
             tell the location list to update its list of locations
@@ -102,14 +89,19 @@ class MapExplorer {
             that means the map bounds changed as well, so tell the location list to update its list of locations
         */
 
-        // console.log(
-        //     '🚀🚀🚀 ~ file: MapExplorer.js:56 ~ newState.selectedLocation🚀🚀🚀',
-        //     selectSelectedLocation(newState)
-        // );
-        // console.log(
-        //     '🚀🚀🚀 ~ file: MapExplorer.js:56 ~ prevState.selectedLocation🚀🚀🚀',
-        //     selectSelectedLocation(prevState)
-        // );
+        const mapBounds = selectMapBounds(newState);
+        const prevMapBounds = selectMapBounds(prevState);
+        const hideOutOfBounds = selectHideOutOfBoundsLocations(newState);
+
+        if (mapBounds !== prevMapBounds && hideOutOfBounds) {
+            this.locationList.updateLocations('bounds', {
+                data: { bounds: mapBounds },
+            });
+            this.locationList.scrollSelectedToTop(
+                selectSelectedLocation(newState).id
+            );
+        }
+
         const selectedLocation = selectSelectedLocation(newState);
         const prevSelectedLocation = selectSelectedLocation(prevState);
 
@@ -123,19 +115,6 @@ class MapExplorer {
 
             this.map.update({ lat, lng }, zoomLevel);
             this.map.highlightMarker(selectedLocation);
-        }
-
-        const mapBounds = selectMapBounds(newState);
-        const prevMapBounds = selectMapBounds(prevState);
-        const hideOutOfBounds = selectHideOutOfBoundsLocations(newState);
-
-        if (mapBounds !== prevMapBounds && hideOutOfBounds) {
-            console.log(
-                `🤩: handling state change! :: mapBounds !== prevMapBounds && hideOutOfBounds`
-            );
-            this.locationList.updateLocations('bounds', {
-                data: { bounds: mapBounds },
-            });
         }
 
         const searched = selectSearched(newState);

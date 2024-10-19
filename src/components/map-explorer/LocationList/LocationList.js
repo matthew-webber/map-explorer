@@ -4,6 +4,7 @@ class LocationList {
         this.locations = [];
         this.onLocationClick = null;
         this.selectedId = null;
+        this.locationsInBounds = [];
     }
 
     init(locations, onLocationClick) {
@@ -48,20 +49,19 @@ class LocationList {
     }
 
     scrollSelectedToTop(id) {
-        const listItem = document.querySelector(`[data-id="${id}"]`);
-        listItem.scrollIntoView({ behavior: 'instant', block: 'start' });
+        if (this.locationInBounds(id)) {
+            const listItem = document.querySelector(`[data-id="${id}"]`);
+            listItem.scrollIntoView({ behavior: 'instant', block: 'start' });
+        }
     }
 
-    selectedInBounds() {
+    locationInBounds(id) {
         return this.locationsInBounds.find(
-            (location) => location.locationId === this.selectedId
+            (location) => location.locationId === id
         );
     }
 
     renderList(locations) {
-        console.log(
-            '🚀🚀🚀 ~ file: LocationList.js:62 ~ renderList ~ renderList🚀🚀🚀'
-        );
         this.listContainer.innerHTML = ''; // Clear existing entries
 
         locations.forEach((location) => {
@@ -76,15 +76,9 @@ class LocationList {
             // Attach click event to list item
             listItem.addEventListener('click', () => {
                 this.selectedId = location.locationId; // use ID instead of node because node may be removed
-                console.log(`🍕: this.selectedId`, this.selectedId);
                 this.onLocationClick(location);
             });
         });
-
-        // TODO - don't love it
-        if (this.selectedId && this.selectedInBounds()) {
-            this.scrollSelectedToTop(this.selectedId);
-        }
     }
 }
 

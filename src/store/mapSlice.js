@@ -20,9 +20,7 @@ const mapSlice = createSlice({
     },
     reducers: {
         setMapCenter: (state, action) => {
-            console.log('🍕: selectors.setMapCenter');
             const { lat, lng } = action.payload;
-            console.log(`🍕: selectors.setMapCenter ${lat} ${lng}`);
             state.mapCenter = { lat: Number(lat), lng: Number(lng) };
         },
         setZoomLevel: (state, action) => {
@@ -44,10 +42,7 @@ const mapSlice = createSlice({
                 state.zoomLevel = Number(zoomLevel);
 
                 if (bounds) {
-                    console.log(`🍕: updateLocation bounds`, bounds);
                     state.mapBounds = bounds;
-
-                    // console.log(`🍕: updateLocation
                 }
             })
             .addCase(updateMapCenter, (state, action) => {

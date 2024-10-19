@@ -49,9 +49,6 @@ class Map {
 
     // TODO - rename -- updateMap? updateMapCenter? updateMapBounds? idk
     update({ lat, lng }, zoomLevel, mapBounds) {
-        console.log(
-            `Updating map to center: ${lat}, ${lng} and zoom: ${zoomLevel}`
-        );
         if (this.widget) {
             this.widget.setZoom(zoomLevel); // setZoom before panTo, otherwise panTo isn't smooth
             this.widget.panTo({ lat, lng });
@@ -92,7 +89,6 @@ class Map {
     }
 
     highlightMarker(location) {
-        console.log(`Highlighting marker for location: ${location.name}`);
         this.markers.forEach((marker) => {
             if (marker.id === location.id) {
                 marker.element.content.classList.add('map-pin-selected');
