@@ -87,6 +87,7 @@ class MapExplorer {
     };
 
     handleStateChange = (prevState, newState) => {
+        console.log(`⭕️⭕️⭕️⭕️ State changed ⭕️⭕️⭕️⭕️`);
         const locations = selectLocations(newState);
 
         let locationsInBounds = locations;
@@ -97,6 +98,7 @@ class MapExplorer {
         const hideOutOfBounds = selectHideOutOfBoundsLocations(newState);
 
         const selectedLocation = selectSelectedLocation(newState);
+        console.log(`Selected location:`, { ...selectedLocation });
         const prevSelectedLocation = selectSelectedLocation(prevState);
 
         const prevFilters = selectFilterCategories(prevState);
@@ -104,6 +106,7 @@ class MapExplorer {
 
         // Apply filters if they exist, regardless of whether they changed
         if (currentFilters.length > 0) {
+            console.log(`💦 filters exist`);
             locationsMatchingFilters = this.locationList.updateLocations(
                 'filter',
                 {
@@ -113,6 +116,7 @@ class MapExplorer {
         }
 
         if (mapBounds !== prevMapBounds && hideOutOfBounds) {
+            console.log(`💦 Map bounds changed`);
             locationsInBounds = this.locationList.updateLocations('bounds', {
                 data: {
                     bounds: mapBounds,
@@ -122,6 +126,7 @@ class MapExplorer {
         }
 
         if (selectedLocation && selectedLocation !== prevSelectedLocation) {
+            console.log(`💦 Selected location changed`);
             const { lat, lng } = selectedLocation;
             const currentZoom = selectZoomLevel(newState);
             const zoomLevel =
@@ -135,6 +140,7 @@ class MapExplorer {
 
         const searched = selectSearched(newState);
         if (searched.searchInProgress) {
+            console.log(`💦 Search in progress`);
             const { result, radius } = searched;
             this.map.updateViewport(
                 {
@@ -153,22 +159,40 @@ class MapExplorer {
 
         console.log(`Final locations: ${finalLocations.length}`);
 
-        finalLocations.length > 0 &&
-            // IIFE
-            (() => {
-                if (mapBounds !== prevMapBounds && !currentFilters.length) {
-                    this.locationList.renderList(finalLocations);
-                    return;
-                }
-                if (
-                    JSON.stringify(prevFilters) !==
-                    JSON.stringify(currentFilters)
-                ) {
-                    this.locationList.renderList(finalLocations);
-                    this.map.updateMarkers(finalLocations);
-                    return;
-                }
-            })();
+        const rerenderIfChanged = () => {
+            console.log(`rerenderIfChanged called`);
+            let rerendered = false;
+
+            if (mapBounds !== prevMapBounds && !currentFilters.length) {
+                console.log(
+                    `💦 mapBounds are different and there are NO filters`
+                );
+                this.locationList.renderList(finalLocations);
+                rerendered = true;
+            } else if (
+                JSON.stringify(prevFilters) !== JSON.stringify(currentFilters)
+            ) {
+                console.log(`💦 filters are different`);
+                this.locationList.renderList(finalLocations);
+                this.map.updateMarkers(finalLocations);
+                rerendered = true;
+            }
+            console.log(`rerendered is ${rerendered}`);
+            console.log(`selectedLocation is ${selectedLocation}`);
+
+            if (rerendered && selectedLocation) {
+                console.log(
+                    `💦 selectedLocation exists and a rerender occurred`
+                );
+                this.map.highlightMarker(selectedLocation);
+                this.locationList.scrollSelectedToTop(
+                    selectedLocation.id,
+                    finalLocations
+                );
+            }
+        };
+
+        finalLocations.length > 0 && rerenderIfChanged();
     };
 
     async init() {
