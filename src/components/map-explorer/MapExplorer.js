@@ -101,12 +101,6 @@ class MapExplorer {
             locations,
             currentFilters
         );
-        // const locationsInBounds = this.applyBounds(
-        //     locations,
-        //     mapBounds,
-        //     prevMapBounds,
-        //     hideOutOfBounds
-        // );
 
         this.updateSelectedLocation(
             selectedLocation,
@@ -115,10 +109,6 @@ class MapExplorer {
         );
         this.handleSearchProgress(selectSearched(newState));
 
-        // const finalLocations = this.determineFinalLocations(
-        //     locationsMatchingFilters,
-        //     locationsInBounds
-        // );
         console.log(
             `locationsMatchingFilters.length`,
             locationsMatchingFilters.length
@@ -136,44 +126,14 @@ class MapExplorer {
         )(locationsMatchingFilters);
 
         if (JSON.stringify(prevFilters) !== JSON.stringify(currentFilters)) {
-            // this.locationList.renderList(finalLocations);
-            // this.map.updateMarkers(finalLocations);
-            // rerendered = true;
             this.renderMarkers(locationsMatchingFilters, selectedLocation);
         }
-
-        // this.rerenderIfChanged(
-        //     finalLocations,
-        //     mapBounds,
-        //     prevMapBounds,
-        //     currentFilters,
-        //     prevFilters,
-        //     selectedLocation
-        // );
     };
-
-    getLocationsInBounds(locations, mapBounds) {
-        this.locationList.updateLocations('bounds', {
-            data: { bounds: mapBounds, locations },
-        });
-    }
 
     applyFilters(locations, filters) {
         return filters.length > 0
             ? this.locationList.updateLocations('filter', {
                   data: { categories: filters, locations },
-              })
-            : locations;
-    }
-
-    applyBounds(locations, mapBounds, prevMapBounds, hideOutOfBounds) {
-        // console.log(
-        //     `🚀🚀🚀 ~ file: MapExplorer.js:147 ~ applyBounds ~ mapBounds should hide out of bounds`,
-        //     hideOutOfBounds
-        // );
-        return mapBounds !== prevMapBounds && hideOutOfBounds
-            ? this.locationList.updateLocations('bounds', {
-                  data: { bounds: mapBounds, locations },
               })
             : locations;
     }
@@ -214,17 +174,13 @@ class MapExplorer {
         }
     }
 
-    determineFinalLocations(locationsMatchingFilters, locationsInBounds) {
-        return locationsMatchingFilters.filter((location) =>
-            locationsInBounds.includes(location)
-        );
-    }
-
     /**
      * A wrapper function to render the location list
      * @param {Function} renderFunction - function to render the list
      * @param {boolean} hideOutOfBounds - whether to hide locations outside of the map bounds
      * @param {Object} selectedLocation - the user-selected location
+     * @param {Object} mapBounds - the current map bounds
+     * @param {Object[]} currentFilters - the current filters
      * @returns {Function} - the render function
      */
     updateAndRenderList(
@@ -237,56 +193,28 @@ class MapExplorer {
         return (locations) => {
             let activeLocations = locations;
 
-            if (hideOutOfBounds) {
+            if (hideOutOfBounds && !currentFilters.length) {
                 activeLocations = this.locationList.updateLocations('bounds', {
                     data: { bounds: mapBounds, locations },
                 });
                 console.log(`activeLocations`, activeLocations);
             }
-            // prevents an empty list from rendering
-            if (activeLocations.length > 1) {
-                renderFunction(activeLocations);
 
-                this.locationList.scrollSelectedToTop(
-                    selectedLocation.id,
-                    activeLocations
-                );
-            }
+            // prevents an empty list from rendering
+            if (activeLocations.length === 0) return;
+
+            renderFunction(activeLocations);
+
+            this.locationList.scrollSelectedToTop(
+                selectedLocation.id,
+                activeLocations
+            );
         };
     }
 
     renderMarkers(locations, selectedLocation) {
         this.map.updateMarkers(locations);
         this.map.highlightMarker(selectedLocation);
-    }
-
-    rerenderIfChanged(
-        finalLocations,
-        mapBounds,
-        prevMapBounds,
-        currentFilters,
-        prevFilters,
-        selectedLocation
-    ) {
-        let rerendered = false;
-        if (mapBounds !== prevMapBounds && !currentFilters.length) {
-            this.locationList.renderList(finalLocations);
-            rerendered = true;
-        } else if (
-            JSON.stringify(prevFilters) !== JSON.stringify(currentFilters)
-        ) {
-            this.locationList.renderList(finalLocations);
-            this.map.updateMarkers(finalLocations);
-            rerendered = true;
-        }
-
-        if (rerendered && selectedLocation) {
-            this.map.highlightMarker(selectedLocation);
-            this.locationList.scrollSelectedToTop(
-                selectedLocation.id,
-                finalLocations
-            );
-        }
     }
 
     async init() {
@@ -396,8 +324,10 @@ export default MapExplorer;
 
 /*
 // TODO
-- [] test if adding return statements after each conditional in handleStateChange breaks the app
+- [x] test if adding return statements after each conditional in handleStateChange breaks the app
 - [] add restrictions to the map bounds for autocomplete search
+- [] Hollings Cancer Center Mt Pleasant + Gynecology Oncology East Cooper have bad coordinates
+
 
 
 */
