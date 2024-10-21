@@ -19,15 +19,11 @@ const mapSlice = createSlice({
         },
     },
     reducers: {
-        setMapCenter: (state, action) => {
-            const { lat, lng } = action.payload;
-            state.mapCenter = { lat: Number(lat), lng: Number(lng) };
-        },
-        setZoomLevel: (state, action) => {
-            state.zoomLevel = Number(action.payload);
-        },
-        setMapBounds: (state, action) => {
-            state.mapBounds = action.payload;
+        setMapState: (state, action) => {
+            const { mapCenter, zoomLevel, mapBounds } = action.payload;
+            state.mapCenter = { lat: Number(mapCenter.lat), lng: Number(mapCenter.lng) };
+            state.zoomLevel = Number(zoomLevel);
+            state.mapBounds = mapBounds;
         },
     },
     extraReducers: (builder) => {
@@ -62,7 +58,7 @@ const mapSlice = createSlice({
     },
 });
 
-export const { setMapCenter, setZoomLevel, setMapBounds } = mapSlice.actions;
+export const { setMapState } = mapSlice.actions; // Export the new combined action
 export const { selectMapCenter, selectZoomLevel, selectMapBounds } =
     mapSlice.selectors;
 export default mapSlice.reducer;

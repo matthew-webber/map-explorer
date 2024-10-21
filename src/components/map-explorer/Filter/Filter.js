@@ -13,14 +13,17 @@ class Filter {
 
     renderCategories(categories) {
         this.filterContainer.innerHTML = ''; // Clear previous filters
+        // console.log(`Rendering categories:`, categories);
         categories.forEach((category) => {
             const checkbox = document.createElement('input');
             const label = document.createElement('label');
+
             checkbox.type = 'checkbox';
-            checkbox.id = category;
-            checkbox.value = category;
-            label.htmlFor = category;
-            label.textContent = category;
+            checkbox.dataset.id = category.id;
+            checkbox.value = category.name;
+
+            label.htmlFor = category.name;
+            label.textContent = category.name;
             label.prepend(checkbox);
 
             // Attach a more isolated event handler
@@ -34,11 +37,11 @@ class Filter {
     }
 
     handleCheckboxChange(category, checkbox) {
-        console.log(`Checkbox ${category} changed to ${checkbox.checked}`);
-        console.log(
-            'Array.isArray(this.selectedCategories)',
-            Array.isArray(this.selectedCategories)
-        );
+        // console.log(
+        //     `Checkbox`,
+        //     { ...category },
+        //     `changed to ${checkbox.checked}`
+        // );
         if (checkbox.checked) {
             this.selectedCategories = [...this.selectedCategories, category];
         } else {
@@ -46,7 +49,7 @@ class Filter {
                 (selectedCategory) => selectedCategory !== category
             );
         }
-        console.log(`Selected categories: ${this.selectedCategories}`);
+        // console.log(`Selected categories:`, { ...this.selectedCategories });
         this.onFilterChange(this.selectedCategories);
     }
 }

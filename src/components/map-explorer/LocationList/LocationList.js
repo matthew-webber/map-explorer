@@ -1,20 +1,20 @@
+// @ts-check
+
 class LocationList {
     constructor() {
         this.listContainer = document.querySelector('#location-list');
-        this.locations = [];
         this.onLocationClick = null;
         this.selectedId = null;
         this.locationsInBounds = [];
     }
 
     init(locations, onLocationClick) {
-        this.locations = locations;
         this.onLocationClick = onLocationClick;
         this.renderList(locations);
     }
 
-    getLocationsInBounds(bounds) {
-        return [...this.locations].filter((location) => {
+    getLocationsInBounds(bounds, locations) {
+        return [...locations].filter((location) => {
             const isWithinBounds =
                 bounds.south < location.buildingLatitude &&
                 location.buildingLatitude < bounds.north &&
@@ -25,71 +25,77 @@ class LocationList {
         });
     }
 
-    getLocationsMatchingCategories(filters) {
+    getLocationsMatchingCategories(filters, locations) {
         if (filters.length === 0) {
-            return this.locations;
+            return locations;
         }
-        const locationsMatchingCategories = this.locations.filter(
-            (location) => {
-                // console.log(`location is`, { ...location });
-                return location.categoriesArray.some((category) =>
-                    filters.includes(category.categoryName)
-                );
-            }
-        );
-        console.log(
-            `Locations matching categories: ${locationsMatchingCategories.length}`
-        );
+        const locationsMatchingCategories = locations.filter((location) => {
+            return location.categoriesArray.some((category) =>
+                filters
+                    .map((filter) => filter.name)
+                    .includes(category.categoryName)
+            );
+        });
+        // console.log(
+        // `Locations matching categories: ${locationsMatchingCategories.length}`
+        // );
         return locationsMatchingCategories;
     }
 
     updateLocations(type, { data }) {
+        const { bounds, categories, locations } = data;
+
         switch (type) {
             case 'bounds': {
-                const { bounds } = data;
-                const locationsInBounds = this.getLocationsInBounds(bounds);
+                const locationsInBounds = this.getLocationsInBounds(
+                    bounds,
+                    locations
+                );
 
                 // don't re-render if there are no markers in bounds
                 if (locationsInBounds.length === 0) {
                     return;
                 }
 
-                this.locationsInBounds = locationsInBounds; // TODO - return this
-                this.renderList(locationsInBounds); // TODO - call this in handleStateChange parent and rename this from updateLocations()
-                break;
+                return locationsInBounds;
             }
             case 'filter': {
-                const { categories } = data;
-                console.log(`Filtering by categories: ${categories}`);
-                console.log(`data is`, { ...data });
+                console.log(`Filtering locations by categories:`, categories);
+                console.log(`Total locations: ${locations.length}`);
+                const filteredLocations = this.getLocationsMatchingCategories(
+                    categories,
+                    locations
+                );
 
-                this.locationsMatchingCategories =
-                    this.getLocationsMatchingCategories(categories);
-
-                this.renderList(this.locationsMatchingCategories); // TODO - call this in handleStateChange parent and rename this from updateLocations()
-                return this.locationsMatchingCategories;
-
-                break;
+                console.log(`Filtered locations: ${filteredLocations.length}`);
+                return filteredLocations;
             }
             default:
                 break;
         }
     }
 
-    scrollSelectedToTop(id) {
-        if (this.locationInBounds(id)) {
+    scrollSelectedToTop(id, locations) {
+        if (this.locationInBounds(id, locations)) {
             const listItem = document.querySelector(`[data-id="${id}"]`);
+            // @ts-ignore
             listItem.scrollIntoView({ behavior: 'instant', block: 'start' });
         }
     }
 
-    locationInBounds(id) {
-        return this.locationsInBounds.find(
-            (location) => location.locationId === id
-        );
+    /**
+     *
+     * @param {string} id
+     * @param {Object[]} locations
+     * @returns
+     */
+    locationInBounds(id, locations) {
+        return locations.find((location) => location.locationId === id);
     }
 
     renderList(locations) {
+        console.log(`asdf renderList`);
+        // @ts-ignore
         this.listContainer.innerHTML = ''; // Clear existing entries
 
         locations.forEach((location) => {
@@ -99,6 +105,7 @@ class LocationList {
             listItem.classList.add('location-item'); // TODO - does this class do anything?
             listItem.textContent = location.locationName;
 
+            // @ts-ignore
             this.listContainer.appendChild(listItem);
 
             // Attach click event to list item

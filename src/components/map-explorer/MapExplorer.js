@@ -6,14 +6,13 @@ import LocationList from './LocationList/LocationList.js';
 import { Loader } from '@googlemaps/js-api-loader';
 import {
     setLocations,
+    setFilteredLocations,
     selectLocations,
+    selectFilteredLocations,
     selectHideOutOfBoundsLocations,
 } from '../../store/locationsSlice.js';
 import {
-    setMapCenter,
-    selectMapCenter,
     selectZoomLevel,
-    setZoomLevel,
     selectMapBounds,
 } from '../../store/mapSlice.js';
 import {
@@ -43,7 +42,8 @@ class MapExplorer {
         this.searchBar = new SearchBar();
         this.filter = new Filter();
         this.locationList = new LocationList(this.handleLocationClick);
-        this.state = null;
+        this.state = store.getState();
+        this.locations = [];
     }
 
     subscribeToStore = () => {
@@ -56,15 +56,6 @@ class MapExplorer {
 
     handleLocationClick = (location) => {
         store.dispatch(setSelectedLocation(location));
-        // store.dispatch(
-        //     updateLocation({
-        //         location,
-        //         latitude: location.buildingLatitude,
-        //         longitude: location.buildingLongitude,
-        //         zoomLevel: 10, // Consider making this dynamic based on current zoom
-        //     })
-        // );
-        // store.dispatch(setSelectedLocation(location));
     };
 
     handleSearch = (search) => {
@@ -82,33 +73,63 @@ class MapExplorer {
 
     handleFilterChange = (filters) => {
         store.dispatch(setFilterCategories(filters));
+        // const locations = selectLocations(store.getState());
+
+        // const filteredLocations = locations.filter((location) => {
+        //     const locationPassesFilters = filters.every((filter) => {
+        //         const foo = location.categoriesArray.map((category) => {
+        //             return category.categoryID;
+        //         });
+        //         const locationHasFilter = foo.includes(filter.id);
+        //         return locationHasFilter;
+        //     });
+        //     return locationPassesFilters;
+        // });
+
+        // store.dispatch(setFilteredLocations(filteredLocations));
     };
 
     handleStateChange = (prevState, newState) => {
-        /*
-        if the map bounds changed,
-            tell the location list to update its list of locations
-        if the filter changed,
-            tell the location list to update its list of locations
-        if the search query changed,
-            that means the map bounds changed as well, so tell the location list to update its list of locations
-        */
+        const locations = selectLocations(newState);
+        let locationsInBounds = locations;
+        let locationsMatchingFilters = locations;
 
         const mapBounds = selectMapBounds(newState);
         const prevMapBounds = selectMapBounds(prevState);
         const hideOutOfBounds = selectHideOutOfBoundsLocations(newState);
 
-        if (mapBounds !== prevMapBounds && hideOutOfBounds) {
-            this.locationList.updateLocations('bounds', {
-                data: { bounds: mapBounds },
-            });
-            this.locationList.scrollSelectedToTop(
-                selectSelectedLocation(newState).id
-            );
-        }
-
         const selectedLocation = selectSelectedLocation(newState);
         const prevSelectedLocation = selectSelectedLocation(prevState);
+
+        const prevFilters = selectFilterCategories(prevState);
+        const currentFilters = selectFilterCategories(newState);
+        console.log(
+            '🚀🚀🚀 ~ file: MapExplorer.js:109 ~ currentFilters🚀🚀🚀',
+            currentFilters
+        );
+
+        // Always apply filters if they exist, regardless of whether they changed
+        if (currentFilters.length > 0) {
+            locationsMatchingFilters = this.locationList.updateLocations(
+                'filter',
+                {
+                    data: { categories: currentFilters, locations },
+                }
+            );
+        }
+        console.log(
+            '🚀🚀🚀 ~ file: MapExplorer.js:122 ~ locationsMatchingFilters🚀🚀🚀',
+            locationsMatchingFilters
+        );
+
+        if (mapBounds !== prevMapBounds && hideOutOfBounds) {
+            locationsInBounds = this.locationList.updateLocations('bounds', {
+                data: {
+                    bounds: mapBounds,
+                    locations,
+                },
+            });
+        }
 
         if (selectedLocation && selectedLocation !== prevSelectedLocation) {
             const { lat, lng } = selectedLocation;
@@ -118,7 +139,7 @@ class MapExplorer {
                     ? MIN_ZOOM_LEVEL_ON_LOCATION_SELECT
                     : currentZoom;
 
-            this.map.update({ lat, lng }, zoomLevel);
+            this.map.updateViewport({ lat, lng }, zoomLevel);
             this.map.highlightMarker(selectedLocation);
         }
 
@@ -127,7 +148,7 @@ class MapExplorer {
         if (searched.searchInProgress) {
             const { result, radius } = searched;
 
-            this.map.update(
+            this.map.updateViewport(
                 {
                     lat: result.lat,
                     lng: result.lng,
@@ -138,20 +159,35 @@ class MapExplorer {
             store.dispatch(endSearch(newState));
         }
 
-        const prevFilters = selectFilterCategories(prevState);
-        const currentFilters = selectFilterCategories(newState);
+        // Combine filters and bounds to determine final set of locations to display
+        const finalLocations = locationsMatchingFilters.filter((location) =>
+            locationsInBounds.includes(location)
+        );
+        console.log(
+            '🚀🚀🚀 ~ file: MapExplorer.js:161 ~ locationsMatchingFilters🚀🚀🚀',
+            locationsMatchingFilters
+        );
+        console.log(`Final locations:`, finalLocations);
 
-        if (prevFilters !== currentFilters) {
-            this.applyFilters(currentFilters);
-        }
+        console.log(`finalLocations.length: ${finalLocations.length}`);
+        console.log(`locations.length: ${locations.length}`);
+
+        const filteredLocations = selectFilteredLocations(newState);
+        const prevFilteredLocations = selectFilteredLocations(prevState);
+        console.log(`prevLocations.length: ${prevFilteredLocations.length}`);
+
+        // if (
+        //     locationsMatchingFilters.length !== prevFilteredLocations.length &&
+        //     !this.arraysEqual(locationsMatchingFilters, prevFilteredLocations)
+        // ) {
+        this.locationList.renderList(finalLocations);
+        this.map.updateMarkers(finalLocations);
+        // store.dispatch(setFilteredLocations(finalLocations));
+        // }
     };
 
-    applyFilters(filters) {
-        const filteredLocations = this.locationList.updateLocations('filter', {
-            data: { categories: filters },
-        });
-        console.log(`filteredLocations is`, filteredLocations);
-        this.map.updateMarkers(filteredLocations);
+    arraysEqual(a, b) {
+        return JSON.stringify(a) === JSON.stringify(b);
     }
 
     async init() {
@@ -166,19 +202,23 @@ class MapExplorer {
 
         const { locationsArray, latitude, longitude, zoomLevel } = data;
 
+        store.dispatch(setLocations(locationsArray));
+        store.dispatch(setFilteredLocations(locationsArray));
+
         const lat = Number(latitude);
         const lng = Number(longitude);
         const zoom = Number(zoomLevel);
 
-        // store.dispatch(setLocations(locationsArray));
-        // store.dispatch(setMapCenter({ lat, lng }));
+        // Initialize map and add markers
 
         await this.map.init({ lat, lng }, zoom);
         this.map.addMarkers(locationsArray);
 
+        // Initialize location list
+
         this.locationList.init(locationsArray, this.handleLocationClick);
 
-        this.state = store.getState();
+        // this.state = store.getState();
         this.subscribeToStore();
 
         const autocompleteOptions = {
@@ -226,13 +266,30 @@ class MapExplorer {
     }
 
     extractCategories(locations) {
-        const categorySet = new Set();
-        locations.forEach((location) => {
-            location.categoriesArray.forEach((category) => {
-                categorySet.add(category.categoryName);
-            });
-        });
-        return Array.from(categorySet);
+        // Flatten the array of categories from all locations
+        const allCategories = locations.flatMap(
+            (location) => location.categoriesArray
+        );
+
+        // Create a new Set to ensure uniqueness, using JSON string to handle object uniqueness
+        const uniqueCategories = new Set(
+            allCategories.map((category) =>
+                JSON.stringify({
+                    id: category.categoryID,
+                    name: category.categoryName,
+                })
+            )
+        );
+
+        // Convert the Set back to array of objects
+        const uniqueCategoryObjects = Array.from(uniqueCategories, (json) =>
+            JSON.parse(json)
+        );
+
+        // Log the unique categories for debugging
+        // console.log(`Unique categories:`, uniqueCategoryObjects);
+
+        return uniqueCategoryObjects;
     }
 }
 

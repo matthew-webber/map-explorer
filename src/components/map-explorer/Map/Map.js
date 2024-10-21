@@ -1,9 +1,5 @@
 import { store } from '../../../store/store';
-import {
-    setMapCenter,
-    setZoomLevel,
-    setMapBounds,
-} from '../../../store/mapSlice.js'; // Import selectors
+import { setMapState } from '../../../store/mapSlice.js'; // Import selectors
 
 const GOOGLE_MAP_ID = '9b8ee480625b2419'; // Replace with your actual Map ID
 
@@ -42,13 +38,17 @@ class Map {
         const zoom = this.widget.getZoom();
         const bounds = this.widget.getBounds();
 
-        store.dispatch(setMapCenter({ lat: center.lat(), lng: center.lng() }));
-        store.dispatch(setZoomLevel(zoom));
-        store.dispatch(setMapBounds(bounds.toJSON()));
+        store.dispatch(
+            setMapState({
+                mapCenter: { lat: center.lat(), lng: center.lng() },
+                zoomLevel: zoom,
+                mapBounds: bounds.toJSON(),
+            })
+        );
     }
 
     // TODO - rename -- updateMap? updateMapCenter? updateMapBounds? idk
-    update({ lat, lng }, zoomLevel, mapBounds) {
+    updateViewport({ lat, lng }, zoomLevel, mapBounds) {
         if (this.widget) {
             this.widget.setZoom(zoomLevel); // setZoom before panTo, otherwise panTo isn't smooth
             this.widget.panTo({ lat, lng });
@@ -103,13 +103,8 @@ class Map {
     }
 
     updateMarkers(locations) {
-        console.log(`Updating markers with ${locations.length} locations`);
-        console.log(`this.markers was ${this.markers.length}`);
-
         this.clearMarkers();
-        console.log(`this.markers is now ${this.markers.length}`);
         this.addMarkers(locations);
-        console.log(`this.markers is now ${this.markers.length}`);
     }
 }
 

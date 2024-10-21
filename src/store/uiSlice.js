@@ -31,6 +31,7 @@ const uiSlice = createSlice({
         setFilterCategories: (state, action) => {
             state.filterCategories = action.payload;
         },
+        
     },
     selectors: {
         selectSelectedLocation: (state) => state.selectedLocation,
