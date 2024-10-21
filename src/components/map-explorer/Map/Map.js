@@ -22,6 +22,7 @@ class Map {
                 center,
                 zoom,
                 mapId: GOOGLE_MAP_ID,
+                minZoom: zoom,
             }
         );
 
