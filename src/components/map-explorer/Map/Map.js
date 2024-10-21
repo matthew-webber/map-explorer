@@ -103,6 +103,7 @@ class Map {
     }
 
     updateMarkers(locations) {
+        console.log(`asdf updateMarkers`);
         this.clearMarkers();
         this.addMarkers(locations);
     }

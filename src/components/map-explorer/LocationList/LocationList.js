@@ -52,22 +52,14 @@ class LocationList {
                     locations
                 );
 
-                // don't re-render if there are no markers in bounds
-                if (locationsInBounds.length === 0) {
-                    return;
-                }
-
                 return locationsInBounds;
             }
             case 'filter': {
-                console.log(`Filtering locations by categories:`, categories);
-                console.log(`Total locations: ${locations.length}`);
                 const filteredLocations = this.getLocationsMatchingCategories(
                     categories,
                     locations
                 );
 
-                console.log(`Filtered locations: ${filteredLocations.length}`);
                 return filteredLocations;
             }
             default:

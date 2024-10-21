@@ -11,10 +11,7 @@ import {
     selectFilteredLocations,
     selectHideOutOfBoundsLocations,
 } from '../../store/locationsSlice.js';
-import {
-    selectZoomLevel,
-    selectMapBounds,
-} from '../../store/mapSlice.js';
+import { selectZoomLevel, selectMapBounds } from '../../store/mapSlice.js';
 import {
     setSelectedLocation,
     selectSelectedLocation,
@@ -91,6 +88,7 @@ class MapExplorer {
 
     handleStateChange = (prevState, newState) => {
         const locations = selectLocations(newState);
+
         let locationsInBounds = locations;
         let locationsMatchingFilters = locations;
 
@@ -103,12 +101,8 @@ class MapExplorer {
 
         const prevFilters = selectFilterCategories(prevState);
         const currentFilters = selectFilterCategories(newState);
-        console.log(
-            '🚀🚀🚀 ~ file: MapExplorer.js:109 ~ currentFilters🚀🚀🚀',
-            currentFilters
-        );
 
-        // Always apply filters if they exist, regardless of whether they changed
+        // Apply filters if they exist, regardless of whether they changed
         if (currentFilters.length > 0) {
             locationsMatchingFilters = this.locationList.updateLocations(
                 'filter',
@@ -117,10 +111,6 @@ class MapExplorer {
                 }
             );
         }
-        console.log(
-            '🚀🚀🚀 ~ file: MapExplorer.js:122 ~ locationsMatchingFilters🚀🚀🚀',
-            locationsMatchingFilters
-        );
 
         if (mapBounds !== prevMapBounds && hideOutOfBounds) {
             locationsInBounds = this.locationList.updateLocations('bounds', {
@@ -144,10 +134,8 @@ class MapExplorer {
         }
 
         const searched = selectSearched(newState);
-
         if (searched.searchInProgress) {
             const { result, radius } = searched;
-
             this.map.updateViewport(
                 {
                     lat: result.lat,
@@ -155,35 +143,32 @@ class MapExplorer {
                 },
                 radius.zoomLevel
             );
-
             store.dispatch(endSearch(newState));
         }
 
-        // Combine filters and bounds to determine final set of locations to display
+        // Determine final set of locations to display based on bounds and filters
         const finalLocations = locationsMatchingFilters.filter((location) =>
             locationsInBounds.includes(location)
         );
-        console.log(
-            '🚀🚀🚀 ~ file: MapExplorer.js:161 ~ locationsMatchingFilters🚀🚀🚀',
-            locationsMatchingFilters
-        );
-        console.log(`Final locations:`, finalLocations);
 
-        console.log(`finalLocations.length: ${finalLocations.length}`);
-        console.log(`locations.length: ${locations.length}`);
+        console.log(`Final locations: ${finalLocations.length}`);
 
-        const filteredLocations = selectFilteredLocations(newState);
-        const prevFilteredLocations = selectFilteredLocations(prevState);
-        console.log(`prevLocations.length: ${prevFilteredLocations.length}`);
-
-        // if (
-        //     locationsMatchingFilters.length !== prevFilteredLocations.length &&
-        //     !this.arraysEqual(locationsMatchingFilters, prevFilteredLocations)
-        // ) {
-        this.locationList.renderList(finalLocations);
-        this.map.updateMarkers(finalLocations);
-        // store.dispatch(setFilteredLocations(finalLocations));
-        // }
+        finalLocations.length > 0 &&
+            // IIFE
+            (() => {
+                if (mapBounds !== prevMapBounds && !currentFilters.length) {
+                    this.locationList.renderList(finalLocations);
+                    return;
+                }
+                if (
+                    JSON.stringify(prevFilters) !==
+                    JSON.stringify(currentFilters)
+                ) {
+                    this.locationList.renderList(finalLocations);
+                    this.map.updateMarkers(finalLocations);
+                    return;
+                }
+            })();
     };
 
     arraysEqual(a, b) {
