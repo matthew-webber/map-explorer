@@ -4,7 +4,7 @@ import {
     updateMapCenter,
     updateZoomLevel,
     updateMapBounds,
-} from './actions.js'; // Import the new actions
+} from './actions.js';
 
 const mapSlice = createSlice({
     name: 'map',
@@ -21,7 +21,10 @@ const mapSlice = createSlice({
     reducers: {
         setMapState: (state, action) => {
             const { mapCenter, zoomLevel, mapBounds } = action.payload;
-            state.mapCenter = { lat: Number(mapCenter.lat), lng: Number(mapCenter.lng) };
+            state.mapCenter = {
+                lat: Number(mapCenter.lat),
+                lng: Number(mapCenter.lng),
+            };
             state.zoomLevel = Number(zoomLevel);
             state.mapBounds = mapBounds;
         },

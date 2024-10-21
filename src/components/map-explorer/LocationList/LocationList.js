@@ -36,9 +36,6 @@ class LocationList {
                     .includes(category.categoryName)
             );
         });
-        // console.log(
-        // `Locations matching categories: ${locationsMatchingCategories.length}`
-        // );
         return locationsMatchingCategories;
     }
 
@@ -76,12 +73,6 @@ class LocationList {
         }
     }
 
-    /**
-     *
-     * @param {string} id
-     * @param {Object[]} locations
-     * @returns
-     */
     locationInBounds(id, locations) {
         return locations.find((location) => location.locationId === id);
     }
@@ -95,13 +86,12 @@ class LocationList {
             const listItem = document.createElement('div');
             listItem.setAttribute('data-id', location.locationId); // for scrolling on click
 
-            listItem.classList.add('location-item'); // TODO - does this class do anything?
+            listItem.classList.add('location-item');
             listItem.textContent = location.locationName;
 
             // @ts-ignore
             this.listContainer.appendChild(listItem);
 
-            // Attach click event to list item
             listItem.addEventListener('click', () => {
                 this.selectedId = location.locationId; // use ID instead of node because node may be removed
                 this.onLocationClick(location);

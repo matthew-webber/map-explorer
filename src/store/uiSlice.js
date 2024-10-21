@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { updateLocation } from './actions.js'; // Import the new action
+import { updateLocation } from './actions.js';
 
 const uiSlice = createSlice({
     name: 'ui',

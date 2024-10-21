@@ -8,7 +8,6 @@ import {
     setLocations,
     setFilteredLocations,
     selectLocations,
-    selectFilteredLocations,
     selectHideOutOfBoundsLocations,
 } from '../../store/locationsSlice.js';
 import { selectZoomLevel, selectMapBounds } from '../../store/mapSlice.js';
@@ -18,7 +17,6 @@ import {
     selectFilterCategories,
     setFilterCategories,
 } from '../../store/uiSlice.js';
-import { updateLocation } from '../../store/actions.js';
 import {
     startSearch,
     endSearch,
@@ -70,20 +68,6 @@ class MapExplorer {
 
     handleFilterChange = (filters) => {
         store.dispatch(setFilterCategories(filters));
-        // const locations = selectLocations(store.getState());
-
-        // const filteredLocations = locations.filter((location) => {
-        //     const locationPassesFilters = filters.every((filter) => {
-        //         const foo = location.categoriesArray.map((category) => {
-        //             return category.categoryID;
-        //         });
-        //         const locationHasFilter = foo.includes(filter.id);
-        //         return locationHasFilter;
-        //     });
-        //     return locationPassesFilters;
-        // });
-
-        // store.dispatch(setFilteredLocations(filteredLocations));
     };
 
     handleStateChange = (prevState, newState) => {
@@ -139,14 +123,6 @@ class MapExplorer {
     }
 
     updateSelectedLocation(selectedLocation, prevSelectedLocation, newState) {
-        // console.log(
-        //     '🚀🚀🚀 ~ file: MapExplorer.js:149 ~ updateSelectedLocation ~ newState🚀🚀🚀',
-        //     newState
-        // );
-        // console.log(
-        //     '🚀🚀🚀 ~ file: MapExplorer.js:149 ~ updateSelectedLocation ~ prevSelectedLocation🚀🚀🚀',
-        //     prevSelectedLocation
-        // );
         console.log(
             '🚀🚀🚀 ~ file: MapExplorer.js:149 ~ updateSelectedLocation ~ selectedLocation🚀🚀🚀',
             selectedLocation
@@ -232,8 +208,8 @@ class MapExplorer {
         store.dispatch(setLocations(locationsArray));
         store.dispatch(setFilteredLocations(locationsArray));
 
-        const lat = Number(latitude);
-        const lng = Number(longitude);
+        const lat = Number(latitude); // initial center
+        const lng = Number(longitude); // initial center
         const zoom = Number(zoomLevel);
 
         // Initialize map and add markers

@@ -1,7 +1,7 @@
 import { store } from '../../../store/store';
-import { setMapState } from '../../../store/mapSlice.js'; // Import selectors
+import { setMapState } from '../../../store/mapSlice.js'; 
 
-const GOOGLE_MAP_ID = '9b8ee480625b2419'; // Replace with your actual Map ID
+const GOOGLE_MAP_ID = '9b8ee480625b2419'; 
 
 import pinURL from './pin.svg';
 
@@ -9,10 +9,9 @@ let mapPin = null;
 
 class Map {
     constructor(onPinClick) {
-        // Accept the onPinClick callback
         this.markers = [];
         this.widget = null;
-        this.onPinClick = onPinClick; // Store the callback for later use
+        this.onPinClick = onPinClick;
     }
 
     async init(center, zoom) {
@@ -26,12 +25,9 @@ class Map {
             }
         );
 
-        // prevent idle event from firing before the map is fully loaded
-        // google.maps.event.addListenerOnce(this.widget, 'tilesloaded', () => {
         this.widget.addListener('idle', () => {
             this.onIdle();
         });
-        // });
     }
 
     onIdle() {
@@ -48,7 +44,7 @@ class Map {
         );
     }
 
-    // TODO - rename -- updateMap? updateMapCenter? updateMapBounds? idk
+
     updateViewport({ lat, lng }, zoomLevel, mapBounds) {
         if (this.widget) {
             this.widget.setZoom(zoomLevel); // setZoom before panTo, otherwise panTo isn't smooth
@@ -57,7 +53,6 @@ class Map {
     }
 
     addMarkers(locations, selectedLocation) {
-        // this.clearMarkers(); // TODO - ok to remove?
         locations.forEach((location) => {
             const isSelected =
                 selectedLocation &&

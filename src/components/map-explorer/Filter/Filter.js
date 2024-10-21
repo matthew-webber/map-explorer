@@ -12,8 +12,8 @@ class Filter {
     }
 
     renderCategories(categories) {
-        this.filterContainer.innerHTML = ''; // Clear previous filters
-        // console.log(`Rendering categories:`, categories);
+        this.filterContainer.innerHTML = '';
+
         categories.forEach((category) => {
             const checkbox = document.createElement('input');
             const label = document.createElement('label');
@@ -37,11 +37,6 @@ class Filter {
     }
 
     handleCheckboxChange(category, checkbox) {
-        // console.log(
-        //     `Checkbox`,
-        //     { ...category },
-        //     `changed to ${checkbox.checked}`
-        // );
         if (checkbox.checked) {
             this.selectedCategories = [...this.selectedCategories, category];
         } else {
@@ -49,7 +44,6 @@ class Filter {
                 (selectedCategory) => selectedCategory !== category
             );
         }
-        // console.log(`Selected categories:`, { ...this.selectedCategories });
         this.onFilterChange(this.selectedCategories);
     }
 }
