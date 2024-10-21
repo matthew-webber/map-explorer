@@ -68,6 +68,7 @@ class LocationList {
     }
 
     scrollSelectedToTop(id, locations) {
+        console.log(`id is ${id}`);
         if (this.locationInBounds(id, locations)) {
             const listItem = document.querySelector(`[data-id="${id}"]`);
             // @ts-ignore

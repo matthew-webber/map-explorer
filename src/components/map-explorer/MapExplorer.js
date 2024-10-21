@@ -101,12 +101,12 @@ class MapExplorer {
             locations,
             currentFilters
         );
-        const locationsInBounds = this.applyBounds(
-            locations,
-            mapBounds,
-            prevMapBounds,
-            hideOutOfBounds
-        );
+        // const locationsInBounds = this.applyBounds(
+        //     locations,
+        //     mapBounds,
+        //     prevMapBounds,
+        //     hideOutOfBounds
+        // );
 
         this.updateSelectedLocation(
             selectedLocation,
@@ -115,19 +115,48 @@ class MapExplorer {
         );
         this.handleSearchProgress(selectSearched(newState));
 
-        const finalLocations = this.determineFinalLocations(
-            locationsMatchingFilters,
-            locationsInBounds
+        // const finalLocations = this.determineFinalLocations(
+        //     locationsMatchingFilters,
+        //     locationsInBounds
+        // );
+        console.log(
+            `locationsMatchingFilters.length`,
+            locationsMatchingFilters.length
         );
-        this.rerenderIfChanged(
-            finalLocations,
+
+        console.log(`hideOutOfBounds`, hideOutOfBounds);
+        console.log(`mapBounds`, mapBounds);
+
+        this.updateAndRenderList(
+            this.locationList.renderList.bind(this.locationList),
+            hideOutOfBounds,
+            selectedLocation,
             mapBounds,
-            prevMapBounds,
-            currentFilters,
-            prevFilters,
-            selectedLocation
-        );
+            currentFilters
+        )(locationsMatchingFilters);
+
+        if (JSON.stringify(prevFilters) !== JSON.stringify(currentFilters)) {
+            // this.locationList.renderList(finalLocations);
+            // this.map.updateMarkers(finalLocations);
+            // rerendered = true;
+            this.renderMarkers(locationsMatchingFilters, selectedLocation);
+        }
+
+        // this.rerenderIfChanged(
+        //     finalLocations,
+        //     mapBounds,
+        //     prevMapBounds,
+        //     currentFilters,
+        //     prevFilters,
+        //     selectedLocation
+        // );
     };
+
+    getLocationsInBounds(locations, mapBounds) {
+        this.locationList.updateLocations('bounds', {
+            data: { bounds: mapBounds, locations },
+        });
+    }
 
     applyFilters(locations, filters) {
         return filters.length > 0
@@ -138,6 +167,10 @@ class MapExplorer {
     }
 
     applyBounds(locations, mapBounds, prevMapBounds, hideOutOfBounds) {
+        // console.log(
+        //     `🚀🚀🚀 ~ file: MapExplorer.js:147 ~ applyBounds ~ mapBounds should hide out of bounds`,
+        //     hideOutOfBounds
+        // );
         return mapBounds !== prevMapBounds && hideOutOfBounds
             ? this.locationList.updateLocations('bounds', {
                   data: { bounds: mapBounds, locations },
@@ -146,6 +179,18 @@ class MapExplorer {
     }
 
     updateSelectedLocation(selectedLocation, prevSelectedLocation, newState) {
+        // console.log(
+        //     '🚀🚀🚀 ~ file: MapExplorer.js:149 ~ updateSelectedLocation ~ newState🚀🚀🚀',
+        //     newState
+        // );
+        // console.log(
+        //     '🚀🚀🚀 ~ file: MapExplorer.js:149 ~ updateSelectedLocation ~ prevSelectedLocation🚀🚀🚀',
+        //     prevSelectedLocation
+        // );
+        console.log(
+            '🚀🚀🚀 ~ file: MapExplorer.js:149 ~ updateSelectedLocation ~ selectedLocation🚀🚀🚀',
+            selectedLocation
+        );
         if (selectedLocation && selectedLocation !== prevSelectedLocation) {
             const { lat, lng } = selectedLocation;
             const currentZoom = selectZoomLevel(newState);
@@ -173,6 +218,46 @@ class MapExplorer {
         return locationsMatchingFilters.filter((location) =>
             locationsInBounds.includes(location)
         );
+    }
+
+    /**
+     * A wrapper function to render the location list
+     * @param {Function} renderFunction - function to render the list
+     * @param {boolean} hideOutOfBounds - whether to hide locations outside of the map bounds
+     * @param {Object} selectedLocation - the user-selected location
+     * @returns {Function} - the render function
+     */
+    updateAndRenderList(
+        renderFunction,
+        hideOutOfBounds,
+        selectedLocation,
+        mapBounds,
+        currentFilters
+    ) {
+        return (locations) => {
+            let activeLocations = locations;
+
+            if (hideOutOfBounds) {
+                activeLocations = this.locationList.updateLocations('bounds', {
+                    data: { bounds: mapBounds, locations },
+                });
+                console.log(`activeLocations`, activeLocations);
+            }
+            // prevents an empty list from rendering
+            if (activeLocations.length > 1) {
+                renderFunction(activeLocations);
+
+                this.locationList.scrollSelectedToTop(
+                    selectedLocation.id,
+                    activeLocations
+                );
+            }
+        };
+    }
+
+    renderMarkers(locations, selectedLocation) {
+        this.map.updateMarkers(locations);
+        this.map.highlightMarker(selectedLocation);
     }
 
     rerenderIfChanged(

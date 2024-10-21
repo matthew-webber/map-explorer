@@ -28,7 +28,8 @@ const locationsSlice = createSlice({
     },
 });
 
-export const { setLocations, setFilteredLocations, setLocationsInBounds } = locationsSlice.actions;
+export const { setLocations, setFilteredLocations, setLocationsInBounds } =
+    locationsSlice.actions;
 
 export const {
     selectLocations,
