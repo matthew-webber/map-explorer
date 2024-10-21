@@ -171,10 +171,6 @@ class MapExplorer {
             })();
     };
 
-    arraysEqual(a, b) {
-        return JSON.stringify(a) === JSON.stringify(b);
-    }
-
     async init() {
         const loader = new Loader(GOOGLE_MAPS_API_OPTIONS);
         await loader.load();
